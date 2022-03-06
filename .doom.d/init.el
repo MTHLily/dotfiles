@@ -211,8 +211,6 @@
         )
       )
 
-(setq dropbox-access-token "RuTnbEw2fS4AAAAAAAAAAUojg6WX7XYeuYo6q0kUixZmRvvnc4LODSCsl_nR0tJa")
-
 (defun my-open-calendar ()
   (interactive)
   (cfw:open-calendar-buffer
