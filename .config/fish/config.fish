@@ -16,9 +16,11 @@ alias sail="[ -f sail ] && bash sail || bash vendor/bin/sail"
 alias sa="sail artisan"
 alias sap="sail php"
 alias pa="php artisan"
-alias ls="exa -al"
+alias ls="exa -al --icons"
 alias vim="nvim"
 alias sc="sudo systemctl"
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+alias rscp='rsync --info=progress2 -auvz'
 
 starship init fish | source
+export PATH="$PATH:$HOME/.spicetify"

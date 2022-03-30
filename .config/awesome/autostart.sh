@@ -35,5 +35,5 @@ run mailspring
 #run telegram-desktop
 run flameshot
 # run qbittorrent
-run calibre
+# run calibre
 run nextcloud

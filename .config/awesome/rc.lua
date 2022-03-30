@@ -131,9 +131,9 @@ local rofilaunchertheme = "misc" -- colorful | misc | ribbon | slate | text
 
 -- awesome variables
 awful.util.terminal = terminal
-awful.util.tagnames = {"➊", "➋", "➌", "➍", "➎", "➏", "➐", "➑", "➒"}
+-- awful.util.tagnames = {"➊", "➋", "➌", "➍", "➎", "➏", "➐", "➑", "➒"}
 -- awful.util.tagnames = {  "", "", "", "", "➎", "➏", "➐", "➑", "➒" }
-awful.util.tagnames = {" ", " ", " ", " ", " ", " ", " ", " ", " "}
+awful.util.tagnames = {" ", " ", " ", " ", " ", " ", " ﭮ", " ", " "}
 -- awful.util.tagnames = {  " ", "", "", "➍", "➎", "➏", "➐", "➑", "" }
 -- awful.util.tagnames = { "⠐", "⠡", "⠲", "⠵", "⠻", "⠿" }
 -- awful.util.tagnames = { "⌘", "♐", "⌥", "ℵ" }
@@ -1110,12 +1110,21 @@ awful.rules.rules = { -- All clients will match this rule.
 }, -- Set applications to always map on the tag 2 on screen 1.
 -- { rule = { class = "Subl" },
 -- properties = { screen = 1, tag = awful.util.tagnames[2], switchtotag = true  } },
+  {
+  rule = {
+      class = "discord",
+    },
+    properties = {
+      screen = 2,
+      tag = awful.util.tagnames[7]
+    }
+},
 {
     rule = {
         class = "Spotify"
     },
     properties = {
-        screen = 2,
+        screen = 3,
         tag = awful.util.tagnames[9]
     }
 }, {
