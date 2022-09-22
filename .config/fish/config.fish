@@ -10,7 +10,7 @@ end
 
 # Path Additions
 fish_add_path $HOME/.local/bin
-
+nvm use lts && clear
 # Aliases
 alias sail="[ -f sail ] && bash sail || bash vendor/bin/sail"
 alias sa="sail artisan"
@@ -24,3 +24,7 @@ alias rscp='rsync --info=progress2 -auvz'
 
 starship init fish | source
 export PATH="$PATH:$HOME/.spicetify"
+export GTK_IM_MODULE='fcitx'
+export QT_IM_MODULE='fcitx'
+export SDL_IM_MODULE='fcitx'
+export XMODIFIERS='@im=fcitx'

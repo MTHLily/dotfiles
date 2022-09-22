@@ -11,8 +11,7 @@ function run {
 #run xrandr --output HDMI2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI1 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output VIRTUAL1 --off
 #autorandr horizontal
 run nm-applet
-run caffeine
-run pamac-tray
+#run caffeine
 #run variety
 run xfce4-power-manager
 run blueberry-tray
@@ -37,3 +36,4 @@ run flameshot
 # run qbittorrent
 # run calibre
 run nextcloud
+run fcitx5 -d

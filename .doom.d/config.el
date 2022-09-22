@@ -32,7 +32,7 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-one)
+(setq doom-theme 'katsushika)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -41,7 +41,7 @@
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
-
+(setq shell-file-name "/bin/bash")
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
@@ -74,3 +74,29 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+(map!
+ :leader
+ :desc "Create new heading at current line"
+ "C-c C--" #'outline-insert-heading
+)
+
+(add-hook 'org-mode-hook 'org-auto-tangle-mode)
+(setq fancy-splash-image "~/.doom.d/themes/assets/hakunon.png")
+
+(setq org-agenda-files '("~/org" "~/org/roam" "~/org/roam/daily"))
+
+
+(use-package! websocket
+    :after org-roam)
+
+(use-package! org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))

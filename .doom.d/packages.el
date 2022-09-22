@@ -18,7 +18,10 @@
 (package! tiny :recipe (:host github :repo "abo-abo/tiny"))
 
 (package! dropbox :recipe (:host github :repo "pavpanchekha/dropbox.el"))
-
+(package! org-super-agenda)
+(package! nvm)
+(package! exec-path-from-shell)
+(package! org-auto-tangle)
 ;; If the package you are trying to install does not contain a PACKAGENAME.el
 ;; file, or is located in a subdirectory of the repo, you'll need to specify
 ;; `:files' in the `:recipe':
@@ -52,3 +55,6 @@
 ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
+
+(unpin! org-roam)
+(package! org-roam-ui)

@@ -1,0 +1,3835 @@
+#+title: Readme
+#+PROPERTY: header-args :results output pp
+
+* Table of Contents :TOC_7:
+- [[#introduction][Introduction]]
+- [[#todos][TODOS]]
+  - [[#better-keybinding-setup][Better Keybinding Setup]]
+  - [[#auto-plug-monitor][Auto plug monitor]]
+- [[#awesome-configuration][Awesome Configuration]]
+  - [[#rclua][rc.lua]]
+    - [[#imports][Imports]]
+    - [[#initialization][Initialization]]
+      - [[#startup-errors][Startup Errors]]
+      - [[#handle-runtime-errors][Handle Runtime Errors]]
+      - [[#helper-functions][Helper Functions]]
+      - [[#packages][Packages]]
+        - [[#awesome-initialization][awesome initialization]]
+        - [[#naughty-init][naughty init]]
+        - [[#beautiful-initialization][beautiful initialization]]
+        - [[#bling-init][bling init]]
+          - [[#flash-focus][Flash Focus]]
+          - [[#window-switcher][Window Switcher]]
+          - [[#task-preview][Task Preview]]
+        - [[#nice-init][nice init]]
+    - [[#variables][Variables]]
+      - [[#keys--tools][Keys & Tools]]
+        - [[#scratch-pads][Scratch Pads]]
+          - [[#calculator-scratchpad][Calculator Scratchpad]]
+      - [[#tags-and-layouts][Tags and Layouts]]
+      - [[#initialize-themes][Initialize Themes]]
+    - [[#bindings][Bindings]]
+      - [[#mouse-bindings][Mouse Bindings]]
+      - [[#key-bindings][Key Bindings]]
+        - [[#mod-key-bindings][Mod Key Bindings]]
+        - [[#mod--shift][Mod + Shift]]
+        - [[#ctrl--shift][Ctrl + Shift]]
+        - [[#ctrl--alt][Ctrl + Alt]]
+        - [[#alt-key][Alt Key]]
+          - [[#window-switching][Window Switching]]
+        - [[#client-navigation][Client Navigation]]
+        - [[#tools][Tools]]
+      - [[#window-rules][Window Rules]]
+      - [[#hooks][Hooks]]
+        - [[#on-connect][On Connect]]
+        - [[#request-titlebars][Request Titlebars]]
+        - [[#sloppy-focus][Sloppy Focus]]
+      - [[#autostart][Autostart]]
+  - [[#themes][Themes]]
+    - [[#katsushika][Katsushika]]
+      - [[#imports-1][Imports]]
+      - [[#color-scheme][Color Scheme]]
+      - [[#alert-variables][Alert Variables]]
+      - [[#variables-1][Variables]]
+        - [[#title-bar][Title Bar]]
+        - [[#notification][Notification]]
+        - [[#third-party-widget-theme][Third Party Widget Theme]]
+      - [[#widgets][Widgets]]
+        - [[#clock][Clock]]
+        - [[#calendar][Calendar]]
+          - [[#vanilla][Vanilla]]
+          - [[#awesome-wm-widgets][Awesome Wm Widgets]]
+        - [[#taskwarrior][Taskwarrior]]
+        - [[#mail][Mail]]
+        - [[#volume][Volume]]
+        - [[#memory][Memory]]
+        - [[#cpu][CPU]]
+        - [[#temperature][Temperature]]
+        - [[#weather][Weather]]
+        - [[#filesystem][Filesystem]]
+        - [[#battery][Battery]]
+          - [[#awesome-upower-battery][Awesome UPower Battery]]
+          - [[#lain-battery][Lain Battery]]
+        - [[#the-rest][The Rest]]
+          - [[#vanilla-1][Vanilla]]
+          -   [[#awesome-widgets][Awesome Widgets]]
+        - [[#network][Network]]
+      - [[#helper-functions-1][Helper Functions]]
+      - [[#hooks-1][Hooks]]
+        - [[#taglist][Taglist]]
+        - [[#tasklist][Tasklist]]
+        - [[#wibox][Wibox]]
+- [[#picom][Picom]]
+  - [[#shadows][Shadows]]
+  - [[#fading][Fading]]
+  - [[#opacity][Opacity]]
+  - [[#background-blurring][Background Blurring]]
+  - [[#general-settings][General Settings]]
+  - [[#custom-definitions][Custom Definitions]]
+- [[#autostart-1][Autostart]]
+
+* Introduction
+
+* TODOS
+** TODO Better Keybinding Setup
+Use this [[https://github.com/jcrd/awesome-ez][library]].
+** TODO Auto plug monitor
+
+* Awesome Configuration
+** rc.lua
+:PROPERTIES:
+:HEADER-ARGS: :tangle rc.lua
+:END:
+*** Imports
+The following packages have been installed:
+
+| Package             | Description                                      | Links |
+|---------------------+--------------------------------------------------+-------|
+| [[https://awesomewm.org/doc/api/libraries/beautiful.html][beautiful]]           | AwesomeWM Decoration See [[Themes]] for more details |       |
+| [[https://awesomewm.org/doc/api/libraries/naughty.html][naughty]]             | Notification daemon                              |       |
+| [[https://github.com/lcpz/awesome-freedesktop][awesome-freedesktop]] | Desktop and menu bars                            |       |
+|---------------------+--------------------------------------------------+-------|
+| [[https://github.com/lcpz/lain][lain]]                | Widgets                                          |       |
+| [[https://blingcorp.github.io/bling/#/][Bling]]               | Widgets                                          | [[bling init][init]]  |
+| [[https://github.com/mut-ex/awesome-wm-nice][nice]]                | Titlebar                                         | [[nice init][init]]  |
+
+#+BEGIN_SRC lua
+--[[
+
+     MTHLily AwesomeWM Configuration
+     https://github.com/awesomeWM
+
+     Freedesktop : https://github.com/lcpz/awesome-freedesktop
+     Based off Multicolor Copycats themes : https://github.com/lcpz/awesome-copycats
+     lain : https://github.com/lcpz/lain
+
+--]] -- {{{ Required libraries
+local awesome, client, mouse, screen, tag = awesome, client, mouse, screen, tag
+local ipairs, string, os, table, tostring, tonumber, type = ipairs, string, os, table, tostring, tonumber, type
+
+local gears = require("gears") -- Utilities such as color parsing and objects
+local awful = require("awful") -- Everything related to window managment
+local wibox = require("wibox")
+local beautiful = require("beautiful")
+local naughty = require("naughty")
+local lain = require("lain")
+local freedesktop = require("freedesktop")
+local hotkeys_popup = require("awful.hotkeys_popup").widget
+local my_table = awful.util.table or gears.table -- 4.{0,1} compatibility
+local dpi = require("beautiful.xresources").apply_dpi
+
+#+END_SRC
+
+*** Initialization
+
+**** Startup Errors
+Checks if there was an error during startup and fallback to another config
+#+BEGIN_SRC lua
+if awesome.startup_errors then
+    naughty.notify(
+        {
+            preset = naughty.config.presets.critical,
+            title = "Oops, there were errors during startup!",
+            text = awesome.startup_errors
+        }
+    )
+end
+#+END_SRC
+**** Handle Runtime Errors
+#+BEGIN_SRC lua
+do
+    local in_error = false
+    awesome.connect_signal(
+        "debug::error",
+        function(err)
+            if in_error then
+                return
+            end
+            in_error = true
+
+            naughty.notify(
+                {
+                    preset = naughty.config.presets.critical,
+                    title = "Oops, an error happened!",
+                    text = tostring(err)
+                }
+            )
+            in_error = false
+        end
+    )
+end
+#+END_SRC
+**** Helper Functions
+#+BEGIN_SRC lua
+local function run_once(cmd_arr)
+    for _, cmd in ipairs(cmd_arr) do
+        awful.spawn.with_shell(string.format("pgrep -u $USER -fx '%s' > /dev/null || (%s)", cmd, cmd))
+    end
+end
+
+run_once({"unclutter -root"})
+
+awful.spawn.with_shell(
+    'if (xrdb -query | grep -q "^awesome\\.started:\\s*true$"); then exit; fi;' ..
+    'xrdb -merge <<< "awesome.started:true";' ..
+    -- list each of your autostart commands, followed by ; inside single quotes, followed by ..
+    'dex --environment Awesome --autostart --search-paths "$XDG_CONFIG_DIRS/autostart:$XDG_CONFIG_HOME/autostart"' -- https://github.com/jceb/dex
+)
+
+#+END_SRC
+**** Packages
+***** awesome initialization
+
+#+BEGIN_SRC lua
+require("awful.autofocus")
+require("awful.hotkeys_popup.keys")
+#+END_SRC
+***** naughty init
+Configure notifications for naughty. For more information, visit the [[https://awesomewm.org/doc/api/libraries/naughty.html][docs]].
+
+#+BEGIN_SRC lua
+naughty.config.defaults["icon_size"] = 100
+#+END_SRC
+***** beautiful initialization
+Load the theme for awesomewm. Katsushika is a theme I made with the [[https://github.com/lcpz/awesome-copycats][Multicolor Copycats theme]] serving as the base which I created the theme from.
+
+#+BEGIN_SRC lua
+local theme_path = string.format("%s/.config/awesome/themes/katsushika/theme.lua", os.getenv("HOME"))
+beautiful.init(theme_path)
+#+END_SRC
+***** bling init
+[[https://blingcorp.github.io/][Bling]] is a very nice widget pack.
+#+BEGIN_SRC lua
+local bling = require("bling")
+#+END_SRC
+****** Flash Focus
+#+BEGIN_SRC lua :tangle no
+bling.module.flash_focus.enable()
+#+END_SRC
+****** Window Switcher
+#+BEGIN_SRC lua
+
+bling.widget.window_switcher.enable {
+  type = "thumbnail",
+}
+#+END_SRC
+
+****** Task Preview
+#+BEGIN_SRC lua
+
+bling.widget.task_preview.enable {
+    x = mouse.coords().x,                    -- The x-coord of the popup
+    y = mouse.coords().y,
+    height = 200,              -- The height of the popup
+    width = 300,               -- The width of the popup
+    placement_fn = function(c) -- Place the widget using awful.placement (this overrides x & y)
+        awful.placement.top_right(c, {
+            margins = {
+                top = 40,
+                right = 30
+            }
+        })
+    end
+}
+#+END_SRC
+***** nice init
+
+Import [[https://github.com/mut-ex/awesome-wm-nice][nice]] into awesome.
+
+#+BEGIN_SRC lua
+local nice = require("nice")
+nice {
+  titlebar_color = beautiful.titlebar_bg_normal,
+  titlebar_radius = 0,
+  filterClients = awful.widget.tasklist.filter.alltags,
+  tooltip_messages = {
+    close = "close",
+    minimize = "minimize",
+    maximize_active = "unmaximize",
+    maximize_inactive = "maximize",
+    floating_active = "tiling mode",
+    floating_inactive = "enable floating mode",
+    ontop_active = "don't keep above other windows",
+    ontop_inactive = "keep above other windows",
+    sticky_active = "disable sticky mode",
+    sticky_inactive = "enable sticky mode",
+  }
+}
+#+END_SRC
+
+*** Variables
+**** Keys & Tools
+#+BEGIN_SRC lua
+-- modkey or mod4 = super key
+local modkey = "Mod4"
+local altkey = "Mod1"
+local modkey1 = "Control"
+
+-- personal variables
+-- change these variables if you want
+local browser1 = "firefox"
+local browser2 = "brave-bin"
+local browser3 = "chromium -no-default-browser-check"
+local editor = os.getenv("EDITOR") or "neovim"
+local editorgui = "emacs ~/.config/awesome/README.org"
+local filemanager = "thunar"
+local mailclient = "mailspring"
+local mediaplayer = "spotify"
+local terminal = "alacritty"
+local virtualmachine = "virtualbox"
+
+-- rofi variables
+local rofilaunchertheme = "misc" -- colorful | misc | ribbon | slate | text
+
+-- awesome variables
+awful.util.terminal = terminal
+#+END_SRC
+
+***** Scratch Pads
+****** Calculator Scratchpad
+#+BEGIN_SRC lua
+local scratch_calc = bling.module.scratchpad {
+    command = "qalculate-gtk",           -- How to spawn the scratchpad
+    rule = { instance = "qalculate-gtk" },                     -- The rule that the scratchpad will be searched by
+    sticky = false,                                    -- Whether the scratchpad should be sticky
+    autoclose = true,                                 -- Whether it should hide itself when losing focus
+    floating = true,                                  -- Whether it should be floating (MUST BE TRUE FOR ANIMATIONS)
+    geometry = {x=360, y=90, height=900, width=1200}, -- The geometry in a floating state
+    reapply = true,                                   -- Whether all those properties should be reapplied on every new opening of the scratchpad (MUST BE TRUE FOR ANIMATIONS)
+    dont_focus_before_close  = false,                 -- When set to true, the scratchpad will be closed by the toggle function regardless of whether its focused or not. When set to false, the toggle function will first bring the scratchpad into focus and only close it on a second call
+}
+#+END_SRC
+
+#+RESULTS:
+
+**** Tags and Layouts
+#+BEGIN_SRC lua
+awful.util.tagnames = {"", "", "", "", "", "", "ﭮ", "", ""}
+
+awful.layout.suit.tile.left.mirror = true
+
+awful.layout.layouts = {
+    awful.layout.suit.tile,
+    awful.layout.suit.floating,
+    awful.layout.suit.tile.left,
+    awful.layout.suit.tile.bottom,
+    awful.layout.suit.tile.top,
+    -- awful.layout.suit.fair,
+    -- awful.layout.suit.fair.horizontal,
+    -- awful.layout.suit.spiral,
+    -- awful.layout.suit.spiral.dwindle,
+    awful.layout.suit.max, -- awful.layout.suit.max.fullscreen,
+    awful.layout.suit.magnifier -- awful.layout.suit.corner.nw,
+    -- awful.layout.suit.corner.ne,
+    -- awful.layout.suit.corner.sw,
+    -- awful.layout.suit.corner.se,
+    -- lain.layout.cascade,
+    -- lain.layout.cascade.tile,
+    -- lain.layout.centerwork,
+    -- lain.layout.centerwork.horizontal,
+    -- lain.layout.termfair,
+    -- lain.layout.termfair.center,
+}
+
+lain.layout.termfair.nmaster = 3
+lain.layout.termfair.ncol = 1
+lain.layout.termfair.center.nmaster = 3
+lain.layout.termfair.center.ncol = 1
+lain.layout.cascade.tile.offset_x = dpi(2)
+lain.layout.cascade.tile.offset_y = dpi(32)
+lain.layout.cascade.tile.extra_padding = dpi(5)
+lain.layout.cascade.tile.nmaster = 5
+lain.layout.cascade.tile.ncol = 2
+
+awful.util.taglist_buttons =
+    my_table.join(
+    awful.button(
+        {},
+        1,
+        function(t)
+            t:view_only()
+        end
+    ),
+    awful.button(
+        {modkey},
+        1,
+        function(t)
+            if client.focus then
+                client.focus:move_to_tag(t)
+            end
+        end
+    ),
+    awful.button({}, 3, awful.tag.viewtoggle),
+    awful.button(
+        {modkey},
+        3,
+        function(t)
+            if client.focus then
+                client.focus:toggle_tag(t)
+            end
+        end
+    ),
+    awful.button(
+        {},
+        4,
+        function(t)
+            awful.tag.viewnext(t.screen)
+        end
+    ),
+    awful.button(
+        {},
+        5,
+        function(t)
+            awful.tag.viewprev(t.screen)
+        end
+    )
+)
+
+awful.util.tasklist_buttons =
+    my_table.join(
+    awful.button(
+        {},
+        1,
+        function(c)
+            if c == client.focus then
+                c.minimized = true
+            else
+                -- c:emit_signal("request::activate", "tasklist", {raise = true})<Paste>
+
+                -- Without this, the following
+                -- :isvisible() makes no sense
+                c.minimized = false
+                if not c:isvisible() and c.first_tag then
+                    c.first_tag:view_only()
+                end
+                -- This will also un-minimize
+                -- the client, if needed
+                client.focus = c
+                c:raise()
+            end
+        end
+    ),
+    awful.button(
+        {},
+        3,
+        function()
+            local instance = nil
+
+            return function()
+                if instance and instance.wibox.visible then
+                    instance:hide()
+                    instance = nil
+                else
+                    instance =
+                        awful.menu.clients(
+                        {
+                            theme = {
+                                width = dpi(250)
+                            }
+                        }
+                    )
+                end
+            end
+        end
+    ),
+    awful.button(
+        {},
+        4,
+        function()
+            awful.client.focus.byidx(1)
+        end
+    ),
+    awful.button(
+        {},
+        5,
+        function()
+            awful.client.focus.byidx(-1)
+        end
+    )
+)
+
+#+END_SRC
+
+#+RESULTS:
+
+**** Initialize Themes
+
+#+BEGIN_SRC lua
+-- }}}
+
+-- {{{ Menu
+local myawesomemenu = {
+    {
+        "hotkeys",
+        function()
+            return false, hotkeys_popup.show_help
+        end
+    },
+    {"arandr", "arandr"}
+}
+
+awful.util.mymainmenu =
+    freedesktop.menu.build(
+    {
+        before = {
+            {"Awesome", myawesomemenu} -- { "Atom", "atom" },
+            -- other triads can be put here
+        },
+        after = {
+            {"Terminal", terminal},
+            {
+                "Log out",
+                function()
+                    awesome.quit()
+                end
+            },
+            {"Sleep", "systemctl suspend"},
+            {"Restart", "systemctl reboot"},
+            {"Shutdown", "systemctl poweroff"} -- other triads can be put here
+        }
+    }
+)
+-- hide menu when mouse leaves it
+-- awful.util.mymainmenu.wibox:connect_signal("mouse::leave", function() awful.util.mymainmenu:hide() end)
+
+-- menubar.utils.terminal = terminal -- Set the Menubar terminal for applications that require it
+-- }}}
+
+-- {{{ Screen
+-- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
+screen.connect_signal(
+    "property::geometry",
+    function(s)
+        -- Wallpaper
+        if beautiful.wallpaper then
+            local wallpaper = beautiful.wallpaper
+            -- If wallpaper is a function, call it with the screen
+            if type(wallpaper) == "function" then
+                wallpaper = wallpaper(s)
+            end
+            gears.wallpaper.maximized(wallpaper, s, true)
+        end
+    end
+)
+
+-- No borders when rearranging only 1 non-floating or maximized client
+screen.connect_signal(
+    "arrange",
+    function(s)
+        local only_one = #s.tiled_clients == 1
+        for _, c in pairs(s.clients) do
+            if only_one and not c.floating or c.maximized then
+                c.border_width = 2
+            else
+                c.border_width = beautiful.border_width
+            end
+        end
+    end
+)
+-- Create a wibox for each screen and add it
+awful.screen.connect_for_each_screen(
+    function(s)
+        beautiful.at_screen_connect(s)
+        s.systray = wibox.widget.systray()
+        s.systray.visible = true
+    end
+)
+-- }}}
+#+END_SRC
+*** Bindings
+**** Mouse Bindings
+#+BEGIN_SRC lua
+-- {{   { Mouse bindings
+root.buttons(my_table.join(awful.button({}, 3, function()
+    awful.util.mymainmenu:toggle()
+end), awful.button({}, 4, awful.tag.viewnext), awful.button({}, 5, awful.tag.viewprev)))
+-- }}}
+#+END_SRC
+
+**** Key Bindings
+
+***** Mod Key Bindings
+
+#+BEGIN_SRC lua
+-- {{{ Key bindings
+globalkeys =
+    my_table.join( -- {{{ Personal keybindings
+    awful.key(
+        {modkey},
+        "[",
+        function()
+            scratch_calc:toggle()
+        end,
+        {
+            description = "Calculator",
+            group = "function keys"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "w",
+        function()
+            awful.util.spawn(browser1)
+        end,
+        {
+            description = browser1,
+            group = "function keys"
+        }
+    ), -- dmenu
+    awful.key(
+        {modkey, "Shift"},
+        "d",
+        function()
+            awful.spawn(
+                string.format(
+                    "dmenu_run -i -nb '#191919' -nf '#fea63c' -sb '#fea63c' -sf '#191919' -fn NotoMonoRegular:bold:pixelsize=14",
+                    beautiful.bg_normal,
+                    beautiful.fg_normal,
+                    beautiful.bg_focus,
+                    beautiful.fg_focus
+                )
+            )
+        end,
+        {
+            description = "show dmenu",
+            group = "hotkeys"
+        }
+    ), -- rofi
+    awful.key(
+        {modkey},
+        "o",
+        function()
+            awful.spawn.with_shell("$HOME/.config/rofi/launchers/" .. rofilaunchertheme .. "/launcher.sh")
+        end,
+        {
+            description = "rofi",
+            group = "function keys"
+        }
+    ), -- Function keys
+    awful.key(
+        {modkey},
+        "F12",
+        function()
+            awful.spawn.with_shell("pkill workrave || workrave &")
+        end,
+        {
+            description = "toggle workrave",
+            group = "function keys"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "F12",
+        function()
+            awful.screen.focused().terminaldropdown:toggle()
+        end,
+        {
+            description = "dropdown terminal",
+            group = "function keys"
+        }
+    ), -- super + ... function keys
+    awful.key(
+        {modkey},
+        "F1",
+        function()
+            awful.util.spawn(browser1)
+        end,
+        {
+            description = browser1,
+            group = "function keys"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "F2",
+        function()
+            awful.util.spawn(editorgui)
+        end,
+        {
+            description = editorgui,
+            group = "function keys"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "F3",
+        function()
+            awful.util.spawn("inkscape")
+        end,
+        {
+            description = "inkscape",
+            group = "function keys"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "F4",
+        function()
+            awful.util.spawn("gimp")
+        end,
+        {
+            description = "gimp",
+            group = "function keys"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "F5",
+        function()
+            awful.util.spawn("meld")
+        end,
+        {
+            description = "meld",
+            group = "function keys"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "F6",
+        function()
+            awful.util.spawn("vlc --video-on-top")
+        end,
+        {
+            description = "vlc",
+            group = "function keys"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "F7",
+        function()
+            awful.util.spawn("virtualbox")
+        end,
+        {
+            description = virtualmachine,
+            group = "function keys"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "F8",
+        function()
+            awful.util.spawn(filemanager)
+        end,
+        {
+            description = filemanager,
+            group = "function keys"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "F9",
+        function()
+            awful.util.spawn(mailclient)
+        end,
+        {
+            description = mailclient,
+            group = "function keys"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "F10",
+        function()
+            awful.util.spawn(mediaplayer)
+        end,
+        {
+            description = mediaplayer,
+            group = "function keys"
+        }
+    ), -- super + ...
+    awful.key(
+        {modkey},
+        "c",
+        function()
+            awful.util.spawn("conky-toggle")
+        end,
+        {
+            description = "conky-toggle",
+            group = "super"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "e",
+        function()
+            awful.spawn.with_shell("$HOME/.config/rofi/launchers/" .. rofilaunchertheme .. "/editor.sh")
+        end,
+        {
+            description = "run gui editor",
+            group = "super"
+        }
+    ), -- awful.key({ modkey }, "h", function () awful.util.spawn( "urxvt -T 'htop task manager' -e htop" ) end,
+    -- {description = "htop", group = "super"}),
+    awful.key(
+        {modkey},
+        ".",
+        function()
+            awful.spawn.with_shell("splatmoji type")
+        end,
+        {
+            description = "emoji keyboard",
+            group = "super"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "r",
+        function()
+            awful.util.spawn("rofi-theme-selector")
+        end,
+        {
+            description = "rofi theme selector",
+            group = "super"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "t",
+        function()
+            awful.util.spawn(terminal)
+        end,
+        {
+            description = "terminal",
+            group = "super"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "v",
+        function()
+            awful.util.spawn("pavucontrol")
+        end,
+        {
+            description = "pulseaudio control",
+            group = "super"
+        }
+    ), -- awful.key({ modkey }, "u", function () awful.screen.focused().mypromptbox:run() end,
+    -- {description = "run prompt", group = "super"}),
+    awful.key(
+        {modkey},
+        "x",
+        function()
+            awful.util.spawn("archlinux-logout")
+        end,
+        {
+            description = "exit",
+            group = "hotkeys"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "Escape",
+        function()
+            awful.util.spawn("xkill")
+        end,
+        {
+            description = "Kill proces",
+            group = "hotkeys"
+        }
+    )
+)
+#+END_SRC
+***** Mod + Shift
+#+BEGIN_SRC lua
+-- super + shift + ...
+globalkeys =
+    my_table.join(
+    globalkeys,
+    awful.key(
+        {modkey, "Shift"},
+        "Return",
+        function()
+            awful.util.spawn(filemanager)
+        end
+    )
+)
+#+END_SRC
+
+***** Ctrl + Shift
+
+#+BEGIN_SRC lua
+        -- ctrl + shift + ...
+globalkeys =
+  my_table.join(
+    globalkeys,
+    awful.key(
+        {modkey1, "Shift"},
+        "Escape",
+        function()
+            awful.util.spawn("xfce4-taskmanager")
+        end
+    )
+)
+#+END_SRC
+
+***** Ctrl + Alt
+
+#+BEGIN_SRC lua
+-- ctrl+alt +  ...
+
+globalkeys =
+    my_table.join(
+    globalkeys,
+    awful.key(
+        {modkey1, altkey},
+        "w",
+        function()
+            awful.util.spawn("arcolinux-welcome-app")
+        end,
+        {
+            description = "ArcoLinux Welcome App",
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "e",
+        function()
+            awful.util.spawn("arcolinux-tweak-tool")
+        end,
+        {
+            description = "ArcoLinux Tweak Tool",
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "Next",
+        function()
+            awful.util.spawn("conky-rotate -n")
+        end,
+        {
+            description = "Next conky rotation",
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "Prior",
+        function()
+            awful.util.spawn("conky-rotate -p")
+        end,
+        {
+            description = "Previous conky rotation",
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "a",
+        function()
+            awful.util.spawn("xfce4-appfinder")
+        end,
+        {
+            description = "Xfce appfinder",
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "b",
+        function()
+            awful.util.spawn(filemanager)
+        end,
+        {
+            description = filemanager,
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "c",
+        function()
+            awful.util.spawn("catfish")
+        end,
+        {
+            description = "catfish",
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "f",
+        function()
+            awful.util.spawn(browser2)
+        end,
+        {
+            description = browser2,
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "g",
+        function()
+            awful.util.spawn(browser3)
+        end,
+        {
+            description = browser3,
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "i",
+        function()
+            awful.util.spawn("nitrogen")
+        end,
+        {
+            description = nitrogen,
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "k",
+        function()
+            awful.util.spawn("archlinux-logout")
+        end,
+        {
+            description = scrlocker,
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "l",
+        function()
+            awful.util.spawn("archlinux-logout")
+        end,
+        {
+            description = scrlocker,
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "o",
+        function()
+            awful.spawn.with_shell("$HOME/.config/awesome/scripts/picom-toggle.sh")
+        end,
+        {
+            description = "Picom toggle",
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "s",
+        function()
+            awful.util.spawn(mediaplayer)
+        end,
+        {
+            description = mediaplayer,
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "t",
+        function()
+            awful.util.spawn(terminal)
+        end,
+        {
+            description = terminal,
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "u",
+        function()
+            awful.util.spawn("pavucontrol")
+        end,
+        {
+            description = "pulseaudio control",
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "v",
+        function()
+            awful.util.spawn(browser1)
+        end,
+        {
+            description = browser1,
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "m",
+        function()
+            awful.util.spawn("xfce4-settings-manager")
+        end,
+        {
+            description = "Xfce settings manager",
+            group = "alt+ctrl"
+        }
+    ),
+    awful.key(
+        {modkey1, altkey},
+        "p",
+        function()
+            awful.util.spawn("pamac-manager")
+        end,
+        {
+            description = "Pamac Manager",
+            group = "alt+ctrl"
+        }
+    )
+)
+    #+END_SRC
+
+***** Alt Key
+
+| Modifier | Key | Description    |
+|----------+-----+----------------|
+| Alt      | F2  | XFCE Appfinder |
+| Alt      |     |                |
+
+
+#+BEGIN_SRC lua
+-- alt + ...
+
+globalkeys =
+    my_table.join(
+    globalkeys,
+    -- awful.key({ altkey, "Shift"   }, "t", function () awful.spawn.with_shell( "variety -t  && wal -i $(cat $HOME/.config/variety/wallpaper/wallpaper.jpg.txt)&" ) end,
+    --     {description = "Pywal Wallpaper trash", group = "altkey"}),
+    -- awful.key({ altkey, "Shift"   }, "n", function () awful.spawn.with_shell( "variety -n  && wal -i $(cat $HOME/.config/variety/wallpaper/wallpaper.jpg.txt)&" ) end,
+    --     {description = "Pywal Wallpaper next", group = "altkey"}),
+    -- awful.key({ altkey, "Shift"   }, "u", function () awful.spawn.with_shell( "wal -i $(cat $HOME/.config/variety/wallpaper/wallpaper.jpg.txt)&" ) end,
+    --     {description = "Pywal Wallpaper update", group = "altkey"}),
+    -- awful.key({ altkey, "Shift"   }, "p", function () awful.spawn.with_shell( "variety -p  && wal -i $(cat $HOME/.config/variety/wallpaper/wallpaper.jpg.txt)&" ) end,
+    --     {description = "Pywal Wallpaper previous", group = "altkey"}),
+    -- awful.key({ altkey }, "t", function () awful.util.spawn( "variety -t" ) end,
+    --     {description = "Wallpaper trash", group = "altkey"}),
+    -- awful.key({ altkey }, "n", function () awful.util.spawn( "variety -n" ) end,
+    --     {description = "Wallpaper next", group = "altkey"}),
+    -- awful.key({ altkey }, "p", function () awful.util.spawn( "variety -p" ) end,
+    --     {description = "Wallpaper previous", group = "altkey"}),
+    -- awful.key({ altkey }, "f", function () awful.util.spawn( "variety -f" ) end,
+    --     {description = "Wallpaper favorite", group = "altkey"}),
+    -- awful.key({ altkey }, "Left", function () awful.util.spawn( "variety -p" ) end,
+    --     {description = "Wallpaper previous", group = "altkey"}),
+    -- awful.key({ altkey }, "Right", function () awful.util.spawn( "variety -n" ) end,
+    --     {description = "Wallpaper next", group = "altkey"}),
+    -- awful.key({ altkey }, "Up", function () awful.util.spawn( "variety --pause" ) end,
+    --     {description = "Wallpaper pause", group = "altkey"}),
+    -- awful.key({ altkey }, "Down", function () awful.util.spawn( "variety --resume" ) end,
+    --     {description = "Wallpaper resume", group = "altkey"}),
+    awful.key(
+        {altkey},
+        "F2",
+        function()
+            awful.util.spawn("xfce4-appfinder --collapsed")
+        end,
+        {
+            description = "Xfce appfinder",
+            group = "altkey"
+        }
+    ),
+    awful.key(
+        {altkey},
+        "F3",
+        function()
+            awful.util.spawn("xfce4-appfinder")
+        end,
+        {
+            description = "Xfce appfinder",
+            group = "altkey"
+        }
+    ),
+    -- awful.key({ altkey }, "F5", function () awful.spawn.with_shell( "xlunch --config ~/.config/xlunch/default.conf --input ~/.config/xlunch/entries.dsv" ) end,
+    --    {description = "Xlunch app launcher", group = "altkey"}),
+
+    -- screenshots
+    awful.key(
+        {},
+        "Print",
+        function()
+            awful.util.spawn("flameshot gui")
+        end,
+        {
+            description = "Scrot",
+            group = "screenshots"
+        }
+    ),
+    awful.key(
+        {modkey1},
+        "Print",
+        function()
+            awful.util.spawn("xfce4-screenshooter")
+        end,
+        {
+            description = "Xfce screenshot",
+            group = "screenshots"
+        }
+    ),
+    awful.key(
+        {modkey1, "Shift"},
+        "Print",
+        function()
+            awful.util.spawn("gnome-screenshot -i")
+        end,
+        {
+            description = "Gnome screenshot",
+            group = "screenshots"
+        }
+    ), -- Personal keybindings}}}
+    -- Hotkeys Awesome
+    awful.key(
+        {modkey},
+        "s",
+        hotkeys_popup.show_help,
+        {
+            description = "show help",
+            group = "awesome"
+        }
+    ), -- Tag browsing with modkey
+    awful.key(
+        {modkey, altkey},
+        "Left",
+        awful.tag.viewprev,
+        {
+            description = "view previous",
+            group = "tag"
+        }
+    ),
+    awful.key(
+        {modkey, altkey},
+        "Right",
+        awful.tag.viewnext,
+        {
+            description = "view next",
+            group = "tag"
+        }
+    ),
+    awful.key(
+        {altkey},
+        "Escape",
+        awful.tag.history.restore,
+        {
+            description = "go back",
+            group = "tag"
+        }
+    ),
+    #+END_SRC
+****** Window Switching
+
+    #+BEGIN_SRC lua
+       -- Tag browsing alt + tab
+    awful.key(
+        {altkey},
+        "Tab",
+        function()
+               awesome.emit_signal("bling::window_switcher::turn_on")
+        end,
+        {
+            description = "Open window switcher",
+            group = "tag"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "Tab",
+        awful.tag.viewnext,
+        {
+            description = "view next",
+            group = "tag"
+        }
+    ),
+    awful.key(
+        {modkey, "Shift"},
+        "Tab",
+        awful.tag.viewprev,
+        {
+            description = "view previous",
+            group = "tag"
+        }
+    ) -- Non-empty tag browsing
+    -- awful.key(
+    --     {altkey},
+    --     "Tab",
+    --     function()
+    --         lain.util.tag_view_nonempty(-1)
+    --     end,
+    --     {description = "view  previous nonempty", group = "tag"}
+    -- ),
+    -- awful.key(
+    --     {altkey, "Shift"},
+    --     "Tab",
+    --     function()
+    --         lain.util.tag_view_nonempty(1)
+    --     end,
+    --     {description = "view  next nonempty", group = "tag"}
+    -- )
+)
+-- Default client focus
+ #+END_SRC
+
+***** Client Navigation
+
+#+BEGIN_SRC lua
+globalkeys =
+    my_table.join(
+    globalkeys,
+    awful.key(
+        {altkey},
+        "j",
+        function()
+            awful.client.focus.byidx(1)
+        end,
+        {
+            description = "focus next by index",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {altkey},
+        "k",
+        function()
+            awful.client.focus.byidx(-1)
+        end,
+        {
+            description = "focus previous by index",
+            group = "client"
+        }
+    ), -- By direction client focus
+    awful.key(
+        {modkey},
+        "j",
+        function()
+            awful.client.focus.global_bydirection("down")
+            if client.focus then
+                client.focus:raise()
+            end
+        end,
+        {
+            description = "focus down",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "k",
+        function()
+            awful.client.focus.global_bydirection("up")
+            if client.focus then
+                client.focus:raise()
+            end
+        end,
+        {
+            description = "focus up",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "h",
+        function()
+            awful.client.focus.global_bydirection("left")
+            if client.focus then
+                client.focus:raise()
+            end
+        end,
+        {
+            description = "focus left",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "l",
+        function()
+            awful.client.focus.global_bydirection("right")
+            if client.focus then
+                client.focus:raise()
+            end
+        end,
+        {
+            description = "focus right",
+            group = "client"
+        }
+    ), -- By direction client focus with arrows
+    awful.key(
+        {modkey},
+        "Down",
+        function()
+            awful.client.focus.global_bydirection("down")
+            if client.focus then
+                client.focus:raise()
+            end
+        end,
+        {
+            description = "focus down",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "Up",
+        function()
+            awful.client.focus.global_bydirection("up")
+            if client.focus then
+                client.focus:raise()
+            end
+        end,
+        {
+            description = "focus up",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "Left",
+        function()
+            awful.client.focus.global_bydirection("left")
+            if client.focus then
+                client.focus:raise()
+            end
+        end,
+        {
+            description = "focus left",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "Right",
+        function()
+            awful.client.focus.global_bydirection("right")
+            if client.focus then
+                client.focus:raise()
+            end
+        end,
+        {
+            description = "focus right",
+            group = "client"
+        }
+    ), -- Layout manipulation
+    awful.key(
+        {modkey, "Shift"},
+        "j",
+        function()
+            awful.client.swap.byidx(1)
+        end,
+        {
+            description = "swap with next client by index",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey, "Shift"},
+        "k",
+        function()
+            awful.client.swap.byidx(-1)
+        end,
+        {
+            description = "swap with previous client by index",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey, "Control"},
+        "j",
+        function()
+            awful.screen.focus_relative(1)
+        end,
+        {
+            description = "focus the next screen",
+            group = "screen"
+        }
+    ),
+    awful.key(
+        {modkey, "Control"},
+        "k",
+        function()
+            awful.screen.focus_relative(-1)
+        end,
+        {
+            description = "focus the previous screen",
+            group = "screen"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "u",
+        awful.client.urgent.jumpto,
+        {
+            description = "jump to urgent client",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey1},
+        "Tab",
+        function()
+            awful.client.focus.history.previous()
+            if client.focus then
+                client.focus:raise()
+            end
+        end,
+        {
+            description = "go back",
+            group = "client"
+        }
+    ), -- Show/Hide Wibox
+    awful.key(
+        {modkey},
+        "b",
+        function()
+            for s in screen do
+                s.mywibox.visible = not s.mywibox.visible
+                if s.mybottomwibox then
+                    s.mybottomwibox.visible = not s.mybottomwibox.visible
+                end
+            end
+        end,
+        {
+            description = "toggle wibox",
+            group = "awesome"
+        }
+    ), -- Show/Hide Systray
+    awful.key(
+        {modkey},
+        "-",
+        function()
+            awful.screen.focused().systray.visible = not awful.screen.focused().systray.visible
+        end,
+        {
+            description = "Toggle systray visibility",
+            group = "awesome"
+        }
+    ), -- Show/Hide Systray
+    awful.key(
+        {modkey},
+        "KP_Subtract",
+        function()
+            awful.screen.focused().systray.visible = not awful.screen.focused().systray.visible
+        end,
+        {
+            description = "Toggle systray visibility",
+            group = "awesome"
+        }
+    ), -- On the fly useless gaps change
+    awful.key(
+        {altkey, "Control"},
+        "j",
+        function()
+            lain.util.useless_gaps_resize(1)
+        end,
+        {
+            description = "increment useless gaps",
+            group = "tag"
+        }
+    ),
+    awful.key(
+        {altkey, "Control"},
+        "h",
+        function()
+            lain.util.useless_gaps_resize(-1)
+        end,
+        {
+            description = "decrement useless gaps",
+            group = "tag"
+        }
+    ), -- Dynamic tagging
+    awful.key(
+        {modkey, "Shift"},
+        "n",
+        function()
+            lain.util.add_tag()
+        end,
+        {
+            description = "add new tag",
+            group = "tag"
+        }
+    ),
+    awful.key(
+        {modkey, "Control"},
+        "r",
+        function()
+            lain.util.rename_tag()
+        end,
+        {
+            description = "rename tag",
+            group = "tag"
+        }
+    ), -- awful.key({ modkey, "Shift" }, "Left", function () lain.util.move_tag(-1) end,
+    --          {description = "move tag to the left", group = "tag"}),
+    -- awful.key({ modkey, "Shift" }, "Right", function () lain.util.move_tag(1) end,
+    --          {description = "move tag to the right", group = "tag"}),
+    awful.key(
+        {modkey, "Shift"},
+        "y",
+        function()
+            lain.util.delete_tag()
+        end,
+        {
+            description = "delete tag",
+            group = "tag"
+        }
+    )
+)
+#+END_SRC
+
+***** Tools
+
+  #+BEGIN_SRC lua
+-- Standard program
+globalkeys =
+    my_table.join(
+    globalkeys,
+    awful.key(
+        {modkey},
+        "Return",
+        function()
+            awful.spawn(terminal)
+        end,
+        {
+            description = terminal,
+            group = "super"
+        }
+    ),
+    awful.key(
+        {modkey, "Shift"},
+        "r",
+        awesome.restart,
+        {
+            description = "reload awesome",
+            group = "awesome"
+        }
+    ), -- awful.key({ modkey, "Shift"   }, "x", awesome.quit,
+    --          {description = "quit awesome", group = "awesome"}),
+    awful.key(
+        {altkey, "Shift"},
+        "l",
+        function()
+            awful.tag.incmwfact(0.05)
+        end,
+        {
+            description = "increase master width factor",
+            group = "layout"
+        }
+    ),
+    awful.key(
+        {altkey, "Shift"},
+        "h",
+        function()
+            awful.tag.incmwfact(-0.05)
+        end,
+        {
+            description = "decrease master width factor",
+            group = "layout"
+        }
+    ),
+    awful.key(
+        {modkey, "Shift"},
+        "h",
+        function()
+            awful.tag.incnmaster(1, nil, true)
+        end,
+        {
+            description = "increase the number of master clients",
+            group = "layout"
+        }
+    ),
+    awful.key(
+        {modkey, "Shift"},
+        "l",
+        function()
+            awful.tag.incnmaster(-1, nil, true)
+        end,
+        {
+            description = "decrease the number of master clients",
+            group = "layout"
+        }
+    ),
+    awful.key(
+        {modkey, "Control"},
+        "h",
+        function()
+            awful.tag.incncol(1, nil, true)
+        end,
+        {
+            description = "increase the number of columns",
+            group = "layout"
+        }
+    ),
+    awful.key(
+        {modkey, "Control"},
+        "l",
+        function()
+            awful.tag.incncol(-1, nil, true)
+        end,
+        {
+            description = "decrease the number of columns",
+            group = "layout"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "space",
+        function()
+            awful.layout.inc(1)
+        end,
+        {
+            description = "select next",
+            group = "layout"
+        }
+    ), -- awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(-1)                end,
+    -- {description = "select previous", group = "layout"}),
+    awful.key(
+        {modkey, "Control"},
+        "n",
+        function()
+            local c = awful.client.restore()
+            -- Focus restored client
+            if c then
+                client.focus = c
+                c:raise()
+            end
+        end,
+        {
+            description = "restore minimized",
+            group = "client"
+        }
+    ), -- Widgets popups
+    -- awful.key({ altkey, }, "c", function () lain.widget.calendar.show(7) end,
+    -- {description = "show calendar", group = "widgets"}),
+    -- awful.key({ altkey, }, "h", function () if beautiful.fs then beautiful.fs.show(7) end end,
+    -- {description = "show filesystem", group = "widgets"}),
+    -- awful.key({ altkey, }, "w", function () if beautiful.weather then beautiful.weather.show(7) end end,
+    -- {description = "show weather", group = "widgets"}),
+    -- Brightness
+    awful.key(
+        {},
+        "XF86MonBrightnessUp",
+        function()
+            os.execute("xbacklight -inc 10")
+        end,
+        {
+            description = "+10%",
+            group = "hotkeys"
+        }
+    ),
+    awful.key(
+        {},
+        "XF86MonBrightnessDown",
+        function()
+            os.execute("xbacklight -dec 10")
+        end,
+        {
+            description = "-10%",
+            group = "hotkeys"
+        }
+    ), -- ALSA volume control
+    awful.key(
+        {modkey},
+        "XF86AudioRaiseVolume",
+        function()
+            os.execute(string.format("amixer -q set %s 1%%+", beautiful.volume.channel))
+            beautiful.volume.update()
+        end
+    ),
+    awful.key(
+        {modkey},
+        "XF86AudioLowerVolume",
+        function()
+            os.execute(string.format("amixer -q set %s 1%%-", beautiful.volume.channel))
+            beautiful.volume.update()
+        end
+    ),
+    awful.key(
+        {modkey},
+        "XF86AudioMute",
+        function()
+            os.execute(
+                string.format("amixer -q set %s toggle", beautiful.volume.togglechannel or beautiful.volume.channel)
+            )
+            beautiful.volume.update()
+        end
+    ),
+    awful.key(
+        {modkey1, "Shift"},
+        "m",
+        function()
+            os.execute(string.format("amixer -q set %s 100%%", beautiful.volume.channel))
+            beautiful.volume.update()
+        end
+    ),
+    awful.key(
+        {modkey1, "Shift"},
+        "0",
+        function()
+            os.execute(string.format("amixer -q set %s 0%%", beautiful.volume.channel))
+            beautiful.volume.update()
+        end
+    ), -- Media keys supported by vlc, spotify, audacious, xmm2, ...
+    -- awful.key({}, "XF86AudioPlay", function() awful.util.spawn("playerctl play-pause", false) end),
+    -- awful.key({}, "XF86AudioNext", function() awful.util.spawn("playerctl next", false) end),
+    -- awful.key({}, "XF86AudioPrev", function() awful.util.spawn("playerctl previous", false) end),
+    -- awful.key({}, "XF86AudioStop", function() awful.util.spawn("playerctl stop", false) end),
+    -- Media keys supported by mpd.
+    awful.key(
+        {},
+        "XF86AudioPlay",
+        function()
+            awful.util.spawn("mpc toggle")
+            beautiful.mpd.update()
+        end,
+        {
+            description = "Pause/Play",
+            group = "mpc"
+        }
+    ),
+    awful.key(
+        {},
+        "XF86AudioNext",
+        function()
+            awful.util.spawn("mpc next")
+            beautiful.mpd.update()
+        end,
+        {
+            description = "Next",
+            group = "mpc"
+        }
+    ),
+    awful.key(
+        {},
+        "XF86AudioPrev",
+        function()
+            awful.util.spawn("mpc prev")
+            beautiful.mpd.update()
+        end,
+        {
+            description = "Previous",
+            group = "mpc"
+        }
+    ),
+    awful.key(
+        {},
+        "XF86AudioStop",
+        function()
+            awful.util.spawn("mpc stop")
+            beautiful.mpd.update()
+        end,
+        {
+            description = "Stop",
+            group = "mpc"
+        }
+    ), -- MPC Volume Control
+    awful.key(
+        {},
+        "XF86AudioRaiseVolume",
+        function()
+            awful.util.spawn("mpc volume +1")
+            beautiful.mpd.update()
+        end,
+        {
+            description = "Raise Volume",
+            group = "mpc"
+        }
+    ),
+    awful.key(
+        {},
+        "XF86AudioLowerVolume",
+        function()
+            awful.util.spawn("mpc volume -1")
+            beautiful.mpd.update()
+        end,
+        {
+            description = "Lower Volume",
+            group = "mpc"
+        }
+    ),
+    awful.key(
+        {modkey1, "Shift"},
+        "s",
+        function()
+            local common = {
+                text = "MPD widget ",
+                position = "top_middle",
+                timeout = 2
+            }
+            if beautiful.mpd.timer.started then
+                beautiful.mpd.timer:stop()
+                common.text = common.text .. lain.util.markup.bold("OFF")
+            else
+                beautiful.mpd.timer:start()
+                common.text = common.text .. lain.util.markup.bold("ON")
+            end
+            naughty.notify(common)
+        end,
+        {
+            description = "mpc on/off",
+            group = "widgets"
+        }
+    ), -- Copy primary to clipboard (terminals to gtk)
+    -- awful.key({ modkey }, "c", function () awful.spawn.with_shell("xsel | xsel -i -b") end,
+    -- {description = "copy terminal to gtk", group = "hotkeys"}),
+    -- Copy clipboard to primary (gtk to terminals)
+    -- awful.key({ modkey }, "v", function () awful.spawn.with_shell("xsel -b | xsel") end,
+    -- {description = "copy gtk to terminal", group = "hotkeys"}),
+    -- Default
+    --[[ Menubar
+
+    awful.key({ modkey }, "p", function() menubar.show() end,
+              {description = "show the menubar", group = "super"})
+    --]] awful.key(
+        {altkey, modkey},
+        "x",
+        function()
+            awful.prompt.run {
+                prompt = "Run Lua code: ",
+                textbox = awful.screen.focused().mypromptbox.widget,
+                exe_callback = awful.util.eval,
+                history_path = awful.util.get_cache_dir() .. "/history_eval"
+            }
+        end,
+        {
+            description = "lua execute prompt",
+            group = "awesome"
+        }
+    ) -- ]]
+)
+
+clientkeys =
+    my_table.join(
+    awful.key(
+        {altkey, "Shift"},
+        "m",
+        lain.util.magnify_client,
+        {
+            description = "magnify client",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "f",
+        function(c)
+            c.fullscreen = not c.fullscreen
+            c:raise()
+        end,
+        {
+            description = "toggle fullscreen",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey, "Shift"},
+        "q",
+        function(c)
+            c:kill()
+        end,
+        {
+            description = "close",
+            group = "hotkeys"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "q",
+        function(c)
+            c:kill()
+        end,
+        {
+            description = "close",
+            group = "hotkeys"
+        }
+    ),
+    awful.key(
+        {modkey, "Shift"},
+        "space",
+        awful.client.floating.toggle,
+        {
+            description = "toggle floating",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey, "Control"},
+        "Return",
+        function(c)
+            c:swap(awful.client.getmaster())
+        end,
+        {
+            description = "move to master",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey, "Shift"},
+        "Left",
+        function(c)
+            c:move_to_screen()
+        end,
+        {
+            description = "move to screen",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey, "Shift"},
+        "Right",
+        function(c)
+            c:move_to_screen(c.screen.index - 1)
+        end,
+        {
+            description = "move to screen",
+            group = "client"
+        }
+    ), -- awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end,
+    -- {description = "toggle keep on top", group = "client"}),
+    awful.key(
+        {modkey},
+        "n",
+        function(c)
+            -- The client currently has the input focus, so it cannot be
+            -- minimized, since minimized clients can't have the focus.
+            c.minimized = true
+        end,
+        {
+            description = "minimize",
+            group = "client"
+        }
+    ),
+    awful.key(
+        {modkey},
+        "m",
+        function(c)
+            c.maximized = not c.maximized
+            c:raise()
+        end,
+        {
+            description = "maximize",
+            group = "client"
+        }
+    )
+)
+
+-- Bind all key numbers to tags.
+-- Be careful: we use keycodes to make it works on any keyboard layout.
+-- This should map on the top row of your keyboard, usually 1 to 9.
+for i = 1, 9 do
+    -- Hack to only show tags 1 and 9 in the shortcut window (mod+s)
+    local descr_view, descr_toggle, descr_move, descr_toggle_focus
+    if i == 1 or i == 9 then
+        descr_view = {
+            description = "view tag #",
+            group = "tag"
+        }
+        descr_toggle = {
+            description = "toggle tag #",
+            group = "tag"
+        }
+        descr_move = {
+            description = "move focused client to tag #",
+            group = "tag"
+        }
+        descr_toggle_focus = {
+            description = "toggle focused client on tag #",
+            group = "tag"
+        }
+    end
+    globalkeys =
+        my_table.join(
+        globalkeys, -- View tag only.
+        awful.key(
+            {modkey},
+            "#" .. i + 9,
+            function()
+                local screen = awful.screen.focused()
+                local tag = screen.tags[i]
+                if tag then
+                    tag:view_only()
+                end
+            end,
+            descr_view
+        ), -- Toggle tag display.
+        awful.key(
+            {modkey, "Control"},
+            "#" .. i + 9,
+            function()
+                local screen = awful.screen.focused()
+                local tag = screen.tags[i]
+                if tag then
+                    awful.tag.viewtoggle(tag)
+                end
+            end,
+            descr_toggle
+        ), -- Move client to tag.
+        awful.key(
+            {modkey, "Shift"},
+            "#" .. i + 9,
+            function()
+                if client.focus then
+                    local tag = client.focus.screen.tags[i]
+                    if tag then
+                        client.focus:move_to_tag(tag)
+                        tag:view_only()
+                    end
+                end
+            end,
+            descr_move
+        ), -- Toggle tag on focused client.
+        awful.key(
+            {modkey, "Control", "Shift"},
+            "#" .. i + 9,
+            function()
+                if client.focus then
+                    local tag = client.focus.screen.tags[i]
+                    if tag then
+                        client.focus:toggle_tag(tag)
+                    end
+                end
+            end,
+            descr_toggle_focus
+        )
+    )
+end
+
+clientbuttons =
+    gears.table.join(
+    awful.button(
+        {},
+        1,
+        function(c)
+            c:emit_signal(
+                "request::activate",
+                "mouse_click",
+                {
+                    raise = true
+                }
+            )
+        end
+    ),
+    awful.button(
+        {modkey},
+        1,
+        function(c)
+            c:emit_signal(
+                "request::activate",
+                "mouse_click",
+                {
+                    raise = true
+                }
+            )
+            awful.mouse.client.move(c)
+        end
+    ),
+    awful.button(
+        {modkey},
+        3,
+        function(c)
+            c:emit_signal(
+                "request::activate",
+                "mouse_click",
+                {
+                    raise = true
+                }
+            )
+            awful.mouse.client.resize(c)
+        end
+    )
+)
+
+-- Set keys
+root.keys(globalkeys)
+-- }}}
+#+END_SRC
+
+
+**** Window Rules
+#+BEGIN_SRC lua
+-- {{{ Rules
+-- Rules to apply to new clients (through the "manage" signal).
+awful.rules.rules = { -- All clients will match this rule.
+{
+    rule = {},
+    properties = {
+        border_width = beautiful.border_width,
+        border_color = beautiful.border_normal,
+        focus = awful.client.focus.filter,
+        raise = true,
+        keys = clientkeys,
+        buttons = clientbuttons,
+        screen = awful.screen.preferred,
+        placement = awful.placement.no_overlap + awful.placement.no_offscreen,
+        size_hints_honor = false
+    }
+}, {
+    rule = {
+        maximized = true
+    },
+    properties = {
+        border_width = 0
+    }
+}, -- Titlebars
+{
+    rule_any = {
+        type = {"dialog", "normal"}
+    },
+    properties = {
+        titlebars_enabled = true
+    }
+}, -- Set applications to always map on the tag 2 on screen 1.
+-- { rule = { class = "Subl" },
+-- properties = { screen = 1, tag = awful.util.tagnames[2], switchtotag = true  } },
+{
+	rule_any = {
+		class = {"persepolis", "kcalc"}
+	},
+	properies = {
+		floating=true
+	}
+},
+
+{
+  rule = {
+      class = "discord",
+    },
+    properties = {
+      tag = awful.util.tagnames[7]
+    }
+},
+{
+	rule = {
+		class = "kalendar"
+	},
+	properties = {
+		tag = awful.util.tagnames[6]
+	}
+},
+{
+    rule = {
+        class = "Spotify"
+    },
+    properties = {
+        tag = awful.util.tagnames[9]
+    }
+}, {
+    rule_any = {
+        class = "firefox"
+    },
+    properties = {
+        tag = awful.util.tagnames[1]
+    }
+}, {
+    rule = {
+        class = "Mailspring"
+    },
+    properties = {
+        tag = awful.util.tagnames[8]
+    }
+}, -- Set applications to always map on the tag 1 on screen 1.
+-- find class or role via xprop command
+-- { rule = { class = browser2 },
+-- properties = { screen = 1, tag = awful.util.tagnames[1], switchtotag = true  } },
+-- { rule = { class = browser1 },
+-- properties = { screen = 1, tag = awful.util.tagnames[1], switchtotag = true  } },
+-- { rule = { class = "Vivaldi-stable" },
+-- properties = { screen = 1, tag = awful.util.tagnames[1], switchtotag = true } },
+-- { rule = { class = "Chromium" },
+-- properties = { screen = 1, tag = awful.util.tagnames[1], switchtotag = true  } },
+-- { rule = { class = "Opera" },
+-- properties = { screen = 1, tag = awful.util.tagnames[1],switchtotag = true  } },
+-- Set applications to always map on the tag 2 on screen 1.
+-- { rule = { class = "Subl" },
+-- properties = { screen = 1, tag = awful.util.tagnames[2],switchtotag = true  } },
+-- { rule = { class = editorgui },
+-- properties = { screen = 1, tag = awful.util.tagnames[2], switchtotag = true  } },
+-- { rule = { class = "Brackets" },
+-- properties = { screen = 1, tag = awful.util.tagnames[2], switchtotag = true  } },
+-- { rule = { class = "Code" },
+-- properties = { screen = 1, tag = awful.util.tagnames[2], switchtotag = true  } },
+--    { rule = { class = "Geany" },
+--  properties = { screen = 1, tag = awful.util.tagnames[2], switchtotag = true  } },
+-- Set applications to always map on the tag 3 on screen 1.
+-- { rule = { class = "Inkscape" },
+-- properties = { screen = 1, tag = awful.util.tagnames[3], switchtotag = true  } },
+-- Set applications to always map on the tag 4 on screen 1.
+-- { rule = { class = "Gimp" },
+-- properties = { screen = 1, tag = awful.util.tagnames[4], switchtotag = true  } },
+-- Set applications to always map on the tag 5 on screen 1.
+-- { rule = { class = "Meld" },
+-- properties = { screen = 1, tag = awful.util.tagnames[5] , switchtotag = true  } },
+-- Set applications to be maximized at startup.
+-- find class or role via xprop command
+-- { rule = { class = editorgui },
+--       properties = { maximized = true } },
+{
+    rule = {
+        class = "Geany"
+    },
+    properties = {
+        maximized = false,
+        floating = false
+    }
+}, -- { rule = { class = "Thunar" },
+--     properties = { maximized = false, floating = false } },
+{
+    rule = {
+        class = "Gimp*",
+        role = "gimp-image-window"
+    },
+    properties = {
+        maximized = true
+    }
+}, {
+    rule = {
+        class = "Gnome-disks"
+    },
+    properties = {
+        maximized = true
+    }
+}, {
+    rule = {
+        class = "inkscape"
+    },
+    properties = {
+        maximized = true
+    }
+}, {
+    rule = {
+        class = mediaplayer
+    },
+    properties = {
+        maximized = true
+    }
+}, {
+    rule = {
+        class = "Vlc"
+    },
+    properties = {
+        maximized = true
+    }
+}, {
+    rule = {
+        class = "VirtualBox Manager"
+    },
+    properties = {
+        maximized = true
+    }
+}, {
+    rule = {
+        class = "VirtualBox Machine"
+    },
+    properties = {
+        maximized = true
+    }
+}, {
+    rule = {
+        class = "Vivaldi-stable"
+    },
+    properties = {
+        maximized = false,
+        floating = false
+    }
+}, {
+    rule = {
+        class = "Vivaldi-stable"
+    },
+    properties = {
+        callback = function(c)
+            c.maximized = false
+        end
+    }
+}, -- IF using Vivaldi snapshot you must comment out the rules above for Vivaldi-stable as they conflict
+--    { rule = { class = "Vivaldi-snapshot" },
+--          properties = { maximized = false, floating = false } },
+--    { rule = { class = "Vivaldi-snapshot" },
+--          properties = { callback = function (c) c.maximized = false end } },
+{
+    rule = {
+        class = "Xfce4-settings-manager"
+    },
+    properties = {
+        floating = false
+    }
+}, -- Floating clients.
+{
+    rule_any = {
+        instance = {"DTA", -- Firefox addon DownThemAll.
+        "copyq" -- Includes session name in class.
+        },
+        class = {"Arandr", "Arcolinux-welcome-app.py", "Blueberry", "Galculator", "Gnome-font-viewer", "Gpick",
+                 "Imagewriter", "Font-manager", "Kruler", "MessageWin", -- kalarm.
+        "kcalc", "persepolis", "archlinux-logout", "Peek", "Skype", "System-config-printer.py", "Sxiv", "Unetbootin.elf", "Wpa_gui",
+                 "pinentry", "veromix", "xtightvncviewer", "Xfce4-terminal"},
+
+        name = {"Event Tester" -- xev.
+        },
+        role = {"AlarmWindow", -- Thunderbird's calendar.
+        "pop-up", -- e.g. Google Chrome's (detached) Developer Tools.
+        "Preferences", "setup"}
+    },
+    properties = {
+        floating = true
+    }
+}, -- Floating clients but centered in screen
+{
+    rule_any = {
+        class = {"Polkit-gnome-authentication-agent-1", "Arcolinux-calamares-tool.py"}
+    },
+    properties = {
+        floating = true
+    },
+    callback = function(c)
+        awful.placement.centered(c, nil)
+    end
+}}
+-- }}}
+#+END_SRC
+**** Hooks
+#+BEGIN_SRC lua
+-- {{{ Signals
+-- Signal function to execute when a new client appears.
+#+END_SRC
+***** On Connect
+#+BEGIN_SRC lua
+client.connect_signal("manage", function(c)
+    -- Set the windows at the slave,
+    -- i.e. put it at the end of others instead of setting it master.
+    -- if not awesome.startup then awful.client.setslave(c) end
+
+    if awesome.startup and not c.size_hints.user_position and not c.size_hints.program_position then
+        -- Prevent clients from being unreachable after screen count changes.
+        awful.placement.no_offscreen(c)
+    end
+end)
+#+END_SRC
+***** Request Titlebars
+#+BEGIN_SRC lua :tangle no
+-- Add a titlebar if titlebars_enabled is set to true in the rules.
+client.connect_signal("request::titlebars", function(c)
+    -- Custom
+    if beautiful.titlebar_fun then
+        beautiful.titlebar_fun(c)
+        return
+    end
+
+    -- Default
+    -- buttons for the titlebar
+    local buttons = my_table.join(awful.button({}, 1, function()
+        c:emit_signal("request::activate", "titlebar", {
+            raise = true
+        })
+        awful.mouse.client.move(c)
+    end), awful.button({}, 3, function()
+        c:emit_signal("request::activate", "titlebar", {
+            raise = true
+        })
+        awful.mouse.client.resize(c)
+    end))
+
+    awful.titlebar(c, {
+        size = dpi(21)
+    }):setup{
+        { -- Left
+            awful.titlebar.widget.iconwidget(c),
+            buttons = buttons,
+            layout = wibox.layout.fixed.horizontal
+        },
+        { -- Middle
+            { -- Title
+                align = "center",
+                widget = awful.titlebar.widget.titlewidget(c)
+            },
+            buttons = buttons,
+            layout = wibox.layout.flex.horizontal
+        },
+        { -- Right
+            awful.titlebar.widget.floatingbutton(c),
+            awful.titlebar.widget.maximizedbutton(c),
+            awful.titlebar.widget.stickybutton(c),
+            awful.titlebar.widget.ontopbutton(c),
+            awful.titlebar.widget.closebutton(c),
+            layout = wibox.layout.fixed.horizontal()
+        },
+        layout = wibox.layout.align.horizontal
+    }
+end)
+#+END_SRC
+
+***** Sloppy Focus
+
+#+BEGIN_SRC lua
+-- Enable sloppy focus, so that focus follows mouse.
+client.connect_signal("mouse::enter", function(c)
+    c:emit_signal("request::activate", "mouse_enter", {
+        raise = false
+    })
+end)
+
+client.connect_signal("focus", function(c)
+    c.border_color = beautiful.border_focus
+end)
+client.connect_signal("unfocus", function(c)
+    c.border_color = beautiful.border_normal
+end)
+
+-- }}}
+#+END_SRC
+**** Autostart
+#+BEGIN_SRC lua
+-- Autostart applications
+awful.spawn.with_shell("~/.config/awesome/autostart.sh")
+awful.spawn.with_shell("picom -b --config  $HOME/.config/awesome/picom.conf")
+#+END_SRC
+
+#+RESULTS:
+
+** Themes
+*** Katsushika
+:PROPERTIES:
+:HEADER-ARGS: :tangle themes/katsushika/theme.lua
+:END:
+**** Imports
+
+#+BEGIN_SRC lua
+--[[
+
+     Katsushika Awesome WM theme
+
+--]]
+local gears = require("gears")
+local lain = require("lain")
+local awful = require("awful")
+local wibox = require("wibox")
+local dpi = require("beautiful.xresources").apply_dpi
+local beautiful = require("beautiful")
+
+local math, string, os = math, string, os
+local my_table = awful.util.table or gears.table -- 4.{0,1} compatibility
+
+#+END_SRC
+**** Color Scheme
+
+Sourced from [[https://github.com/rebelot/kanagawa.nvim]]
+
+| <15>                               | Name          | Hex       | Usage                                                                             |
+|------------------------------------+---------------+-----------+-----------------------------------------------------------------------------------|
+| [[./assets/circles/fujiWhite.svg]]     | fujiWhite     | `#DCD7BA` | Default foreground                                                                |
+| [[./assets/circles/oldWhite.svg]]      | oldWhite      | `#C8C093` | Dark foreground (statuslines)                                                     |
+| [[./assets/circles/sumiInk0.svg]]      | sumiInk0      | `#16161D` | Dark background (statuslines and floating windows)                                |
+| [[./assets/circles/sumiInk1.svg]]      | sumiInk1      | `#1F1F28` | Default background                                                                |
+| [[./assets/circles/sumiInk2.svg]]      | sumiInk2      | `#2A2A37` | Lighter background (colorcolumn, folds)                                           |
+| [[./assets/circles/sumiInk3.svg]]      | sumiInk3      | `#363646` | Lighter background (cursorline)                                                   |
+| [[./assets/circles/sumiInk4.svg]]      | sumiInk4      | `#54546D` | Darker foreground (line numbers, fold column, non-text characters), float borders |
+| [[./assets/circles/waveBlue1.svg]]     | waveBlue1     | `#223249` | Popup background, visual selection background                                     |
+| [[./assets/circles/waveBlue2.svg]]     | waveBlue2     | `#2D4F67` | Popup selection background, search background                                     |
+| [[./assets/circles/winterGreen.svg]]   | winterGreen   | `#2B3328` | Diff Add (background)                                                             |
+| [[./assets/circles/winterYellow.svg]]  | winterYellow  | `#49443C` | Diff Change (background)                                                          |
+| [[./assets/circles/winterRed.svg]]     | winterRed     | `#43242B` | Diff Deleted (background)                                                         |
+| [[./assets/circles/winterBlue.svg]]    | winterBlue    | `#252535` | Diff Line (background)                                                            |
+| [[./assets/circles/autumnGreen.svg]]   | autumnGreen   | `#76946A` | Git Add                                                                           |
+| [[./assets/circles/autumnRed.svg]]     | autumnRed     | `#C34043` | Git Delete                                                                        |
+| [[./assets/circles/autumnYellow.svg]]  | autumnYellow  | `#DCA561` | Git Change                                                                        |
+| [[./assets/circles/samuraiRed.svg]]    | samuraiRed    | `#E82424` | Diagnostic Error                                                                  |
+| [[./assets/circles/roninYellow.svg]]   | roninYellow   | `#FF9E3B` | Diagnostic Warning                                                                |
+| [[./assets/circles/waveAqua1.svg]]     | waveAqua1     | `#6A9589` | Diagnostic Info                                                                   |
+| [[./assets/circles/dragonBlue.svg]]    | dragonBlue    | `#658594` | Diagnostic Hint                                                                   |
+| [[./assets/circles/fujiGray.svg]]      | fujiGray      | `#727169` | Comments                                                                          |
+| [[./assets/circles/springViolet1.svg]] | springViolet1 | `#938AA9` | Light foreground                                                                  |
+| [[./assets/circles/oniViolet.svg]]     | oniViolet     | `#957FB8` | Statements and Keywords                                                           |
+| [[./assets/circles/crystalBlue.svg]]   | crystalBlue   | `#7E9CD8` | Functions and Titles                                                              |
+| [[./assets/circles/springViolet2.svg]] | springViolet2 | `#9CABCA` | Brackets and punctuation                                                          |
+| [[./assets/circles/springBlue.svg]]    | springBlue    | `#7FB4CA` | Specials and builtin functions                                                    |
+| [[./assets/circles/lightBlue.svg]]     | lightBlue     | `#A3D4D5` | Not used                                                                          |
+| [[./assets/circles/waveAqua2.svg]]     | waveAqua2     | `#7AA89F` | Types                                                                             |
+| [[./assets/circles/springGreen.svg]]   | springGreen   | `#98BB6C` | Strings                                                                           |
+| [[./assets/circles/boatYellow1.svg]]   | boatYellow1   | `#938056` | Not used                                                                          |
+| [[./assets/circles/boatYellow2.svg]]   | boatYellow2   | `#C0A36E` | Operators, RegEx                                                                  |
+| [[./assets/circles/carpYellow.svg]]    | carpYellow    | `#E6C384` | Identifiers                                                                       |
+| [[./assets/circles/sakuraPink.svg]]    | sakuraPink    | `#D27E99` | Numbers                                                                           |
+| [[./assets/circles/waveRed.svg]]       | waveRed       | `#E46876` | Standout specials 1 (builtin variables)                                           |
+| [[./assets/circles/peachRed.svg]]      | peachRed      | `#FF5D62` | Standout specials 2 (exception handling, return)                                  |
+| [[./assets/circles/surimiOrange.svg]]  | surimiOrange  | `#FFA066` | Constants, imports, booleans                                                      |
+| [[./assets/circles/katanaGray.svg]]    | katanaGray    | `#717C7C` | Deprecated                                                                        |
+
+#+BEGIN_SRC lua
+local kanagawa = {}
+
+kanagawa.fujiWhite = "#DCD7BA"
+kanagawa.oldWhite = "#C8C093"
+kanagawa.sumiInk0 = "#16161D"
+kanagawa.sumiInk1 = "#1F1F28"
+kanagawa.sumiInk2 = "#2A2A37"
+kanagawa.sumiInk3 = "#363646"
+kanagawa.sumiInk4 = "#54546D"
+kanagawa.waveBlue1 = "#223249"
+kanagawa.waveBlue2 = "#2D4F67"
+kanagawa.winterGreen = "#2B3328"
+kanagawa.winterYellow = "#49443C"
+kanagawa.winterRed = "#43242B"
+kanagawa.winterBlue = "#252535"
+kanagawa.autumnGreen = "#76946A"
+kanagawa.autumnRed = "#C34043"
+kanagawa.autumnYellow = "#DCA561"
+kanagawa.samuraiRed = "#E82424"
+kanagawa.roninYellow = "#FF9E3B"
+kanagawa.waveAqua1 = "#6A9589"
+kanagawa.dragonBlue = "#658594"
+kanagawa.fujiGray = "#727169"
+kanagawa.springViolet1 = "#938AA9"
+kanagawa.oniViolet = "#957FB8"
+kanagawa.crystalBlue = "#7E9CD8"
+kanagawa.springViolet2 = "#9CABCA"
+kanagawa.springBlue = "#7FB4CA"
+kanagawa.lightBlue = "#A3D4D5"
+kanagawa.waveAqua2 = "#7AA89F"
+kanagawa.springGreen = "#98BB6C"
+kanagawa.boatYellow1 = "#938056"
+kanagawa.boatYellow2 = "#C0A36E"
+kanagawa.carpYellow = "#E6C384"
+kanagawa.sakuraPink = "#D27E99"
+kanagawa.waveRed = "#E46876"
+kanagawa.peachRed = "#FF5D62"
+kanagawa.surimiOrange = "#FFA066"
+kanagawa.katanaGray = "#717C7C"
+#+END_SRC
+**** Alert Variables
+
+#+BEGIN_SRC lua
+local theme = {}
+theme.naughty_preset = {}
+
+theme.naughty_preset.normal = {
+  bg = kanagawa.sumiInk1,
+  fg = kanagawa.fujiWhite
+        }
+
+#+END_SRC
+
+**** Variables
+#+BEGIN_SRC lua
+
+theme.dir = os.getenv("HOME") .. "/.config/awesome/themes/powerarrow"
+theme.wallpaper = theme.dir .. "/wallpaper.jpg"
+theme.font = "Iosevka 12"
+theme.taglist_font = "Iosevka 24"
+theme.fg_normal = kanagawa.fujiWhite
+theme.fg_color = kanagawa.fujiWhite
+theme.fg_focus = kanagawa.oldWhite
+theme.fg_urgent = kanagawa.autumnYellow
+theme.bg_normal = kanagawa.sumiInk1
+theme.bg_focus = kanagawa.sumiInk2
+theme.bg_urgent = kanagawa.sumiInk3
+theme.taglist_fg_focus = kanagawa.crystalBlue
+theme.tasklist_bg_focus = kanagawa.waveRed
+theme.tasklist_fg_focus = kanagawa.carpYellow
+theme.topline_bg = kanagawa.autumnRed
+theme.border_width = dpi(2)
+theme.border_normal = kanagawa.oldWhite
+theme.border_focus = kanagawa.autumnRed
+theme.border_marked = kanagawa.sakuraPink
+theme.titlebar_bg_focus = kanagawa.sumiInk1
+theme.titlebar_bg_normal = kanagawa.autumnRed
+theme.titlebar_bg_focus = theme.bg_focus
+theme.titlebar_bg_normal = theme.bg_normal
+theme.titlebar_fg_focus = theme.fg_focus
+theme.menu_height = dpi(25)
+theme.menu_width = dpi(260)
+theme.menu_submenu_icon = theme.dir .. "/icons/submenu.png"
+theme.awesome_icon = theme.dir .. "/icons/awesome.png"
+theme.taglist_squares_sel = theme.dir .. "/icons/square_sel.png"
+theme.taglist_squares_unsel = theme.dir .. "/icons/square_unsel.png"
+theme.layout_tile = theme.dir .. "/icons/tile.png"
+theme.layout_tileleft = theme.dir .. "/icons/tileleft.png"
+theme.layout_tilebottom = theme.dir .. "/icons/tilebottom.png"
+theme.layout_tiletop = theme.dir .. "/icons/tiletop.png"
+theme.layout_fairv = theme.dir .. "/icons/fairv.png"
+theme.layout_fairh = theme.dir .. "/icons/fairh.png"
+theme.layout_spiral = theme.dir .. "/icons/spiral.png"
+theme.layout_dwindle = theme.dir .. "/icons/dwindle.png"
+theme.layout_max = theme.dir .. "/icons/max.png"
+theme.layout_fullscreen = theme.dir .. "/icons/fullscreen.png"
+theme.layout_magnifier = theme.dir .. "/icons/magnifier.png"
+theme.layout_floating = theme.dir .. "/icons/floating.png"
+theme.widget_ac = theme.dir .. "/icons/ac.png"
+theme.widget_battery = theme.dir .. "/icons/battery.png"
+theme.widget_battery_low = theme.dir .. "/icons/battery_low.png"
+theme.widget_battery_empty = theme.dir .. "/icons/battery_empty.png"
+theme.widget_mem = theme.dir .. "/icons/mem.png"
+theme.widget_cpu = theme.dir .. "/icons/cpu.png"
+theme.widget_temp = theme.dir .. "/icons/temp.png"
+theme.widget_net = theme.dir .. "/icons/net.png"
+theme.widget_hdd = theme.dir .. "/icons/hdd.png"
+theme.widget_music = theme.dir .. "/icons/note.png"
+theme.widget_music_on = theme.dir .. "/icons/note.png"
+theme.widget_music_pause = theme.dir .. "/icons/pause.png"
+theme.widget_music_stop = theme.dir .. "/icons/stop.png"
+theme.widget_vol = theme.dir .. "/icons/vol.png"
+theme.widget_vol_low = theme.dir .. "/icons/vol_low.png"
+theme.widget_vol_no = theme.dir .. "/icons/vol_no.png"
+theme.widget_vol_mute = theme.dir .. "/icons/vol_mute.png"
+theme.widget_mail = theme.dir .. "/icons/mail.png"
+theme.widget_mail_on = theme.dir .. "/icons/mail_on.png"
+theme.widget_task = theme.dir .. "/icons/task.png"
+theme.widget_scissors = theme.dir .. "/icons/scissors.png"
+theme.widget_weather = theme.dir .. "/icons/dish.png"
+theme.tasklist_plain_task_name = false
+theme.tasklist_disable_icon = false
+theme.useless_gap = dpi(2)
+
+local markup = lain.util.markup
+local separators = lain.util.separators
+#+END_SRC
+
+***** Title Bar
+#+BEGIN_SRC lua :tangle no
+theme.titlebar_close_button_focus = theme.dir .. "/icons/titlebar/close_focus.png"
+theme.titlebar_close_button_normal = theme.dir .. "/icons/titlebar/close_normal.png"
+theme.titlebar_ontop_button_focus_active = theme.dir .. "/icons/titlebar/ontop_focus_active.png"
+theme.titlebar_ontop_button_normal_active = theme.dir .. "/icons/titlebar/ontop_normal_active.png"
+theme.titlebar_ontop_button_focus_inactive = theme.dir .. "/icons/titlebar/ontop_focus_inactive.png"
+theme.titlebar_ontop_button_normal_inactive = theme.dir .. "/icons/titlebar/ontop_normal_inactive.png"
+theme.titlebar_sticky_button_focus_active = theme.dir .. "/icons/titlebar/sticky_focus_active.png"
+theme.titlebar_sticky_button_normal_active = theme.dir .. "/icons/titlebar/sticky_normal_active.png"
+theme.titlebar_sticky_button_focus_inactive = theme.dir .. "/icons/titlebar/sticky_focus_inactive.png"
+theme.titlebar_sticky_button_normal_inactive = theme.dir .. "/icons/titlebar/sticky_normal_inactive.png"
+theme.titlebar_floating_button_focus_active = theme.dir .. "/icons/titlebar/floating_focus_active.png"
+theme.titlebar_floating_button_normal_active = theme.dir .. "/icons/titlebar/floating_normal_active.png"
+theme.titlebar_floating_button_focus_inactive = theme.dir .. "/icons/titlebar/floating_focus_inactive.png"
+theme.titlebar_floating_button_normal_inactive = theme.dir .. "/icons/titlebar/floating_normal_inactive.png"
+theme.titlebar_maximized_button_focus_active = theme.dir .. "/icons/titlebar/maximized_focus_active.png"
+theme.titlebar_maximized_button_normal_active = theme.dir .. "/icons/titlebar/maximized_normal_active.png"
+theme.titlebar_maximized_button_focus_inactive = theme.dir .. "/icons/titlebar/maximized_focus_inactive.png"
+ theme.titlebar_maximized_button_normal_inactive = theme.dir .. "/icons/titlebar/maximized_normal_inactive.png"
+
+#+END_SRC
+***** Notification
+
+#+BEGIN_SRC lua
+
+theme.notification_bg = kanagawa.sumiInk1
+theme.notification_border_color = kanagawa.fujiWhite
+
+#+END_SRC
+
+***** Third Party Widget Theme
+
+#+BEGIN_SRC lua
+theme.window_switcher_widget_bg = kanagawa.sumiInk1              -- The bg color of the widget
+theme.window_switcher_widget_border_width = dpi(2)            -- The border width of the widget
+theme.window_switcher_widget_border_radius = 4           -- The border radius of the widget
+theme.window_switcher_widget_border_color = kanagawa.oniViolet    -- The border color of the widget
+theme.window_switcher_clients_spacing = 20               -- The space between each client item
+theme.window_switcher_client_icon_horizontal_spacing = 5 -- The space between client icon and text
+theme.window_switcher_client_width = dpi(300)                 -- The width of one client widget
+theme.window_switcher_client_height = 250                -- The height of one client widget
+theme.window_switcher_client_margins = 10                -- The margin between the content and the border of the widget
+theme.window_switcher_thumbnail_margins = 10             -- The margin between one client thumbnail and the rest of the widget
+theme.thumbnail_scale = true                            -- If set to true, the thumbnails fit policy will be set to "fit" instead of "auto"
+theme.window_switcher_name_margins = 10                  -- The margin of one clients title to the rest of the widget
+theme.window_switcher_name_valign = "center"             -- How to vertically align one clients title
+theme.window_switcher_name_forced_width = 200            -- The width of one title
+theme.window_switcher_name_font = "iosevka 11"              -- The font of all titles
+theme.window_switcher_name_normal_color = kanagawa.oldWhite      -- The color of one title if the client is unfocused
+theme.window_switcher_name_focus_color = kanagawa.autumnRed       -- The color of one title if the client is focused
+theme.window_switcher_icon_valign = "center"             -- How to vertically align the one icon
+theme.window_switcher_icon_width = 40                    -- The width of one icon
+#+END_SRC
+
+
+**** Widgets
+
+***** Clock
+#+BEGIN_SRC lua
+-- Textclock
+local clockicon = wibox.widget.imagebox(theme.widget_clock)
+local clock =
+    awful.widget.watch(
+    "date +'%a %d %b %I:%M'",
+    60,
+    function(widget, stdout)
+        widget:set_markup(" " .. markup.font(theme.font, stdout))
+    end
+)
+#+END_SRC
+
+#+RESULTS:
+
+***** Calendar
+****** Vanilla
+#+BEGIN_SRC lua :tangle no
+-- Calendar
+theme.cal =
+    lain.widget.cal(
+    {
+        attach_to = {clock},
+        notification_preset = {
+            font = "Noto Sans Mono Medium 10",
+            fg = theme.fg_normal,
+            bg = theme.bg_normal
+        }
+    }
+)
+#+END_SRC
+****** Awesome Wm Widgets
+#+BEGIN_SRC lua
+local calendar_widget = require("awesome-wm-widgets.calendar-widget.calendar")
+
+ local cw = calendar_widget()
+-- or customized
+local cw = calendar_widget({
+    theme = 'naughty',
+    placement = 'top_left',
+    start_sunday = true,
+    radius = 0,
+-- with customized next/previous (see table above)
+    previous_month_button = 1,
+    next_month_button = 3,
+})
+clock:connect_signal("mouse::enter",
+    function(_, _, _, button)
+        cw.toggle()
+    end)
+clock:connect_signal("mouse::leave",
+    function(_, _, _, button)
+        cw.toggle()
+    end)
+#+END_SRC
+
+#+RESULTS:
+
+***** Taskwarrior
+#+BEGIN_SRC lua
+-- Taskwarrior
+--local task = wibox.widget.imagebox(theme.widget_task)
+--lain.widget.contrib.task.attach(task, {
+-- do not colorize output
+--    show_cmd = "task | sed -r 's/\\x1B\\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g'"
+--})
+--task:buttons(my_table.join(awful.button({}, 1, lain.widget.contrib.task.prompt)))
+#+END_SRC
+***** Mail
+#+BEGIN_SRC lua
+-- Mail IMAP check
+local mailicon = wibox.widget.imagebox(theme.widget_mail)
+--[[ commented because it needs to be set before use
+mailicon:buttons(my_table.join(awful.button({ }, 1, function () awful.spawn(mail) end)))
+theme.mail = lain.widget.imap({
+    timeout  = 180,
+    server   = "server",
+    mail     = "mail",
+    password = "keyring get mail",
+    settings = function()
+        if mailcount > 0 then
+            widget:set_text(" " .. mailcount .. " ")
+            mailicon:set_image(theme.widget_mail_on)
+        else
+            widget:set_text("")
+            mailicon:set_image(theme.widget_mail)
+        end
+    end
+})
+--]]
+#+END_SRC
+***** Volume
+#+BEGIN_SRC lua
+-- ALSA volume
+theme.volume =
+    lain.widget.alsabar(
+    {
+        --togglechannel = "IEC958,3",
+        notification_preset = {font = theme.font, fg = theme.fg_normal}
+    }
+)
+
+--[[
+-- MPD
+local musicplr = "urxvt -title Music -g 130x34-320+16 -e ncmpcpp"
+local mpdicon = wibox.widget.imagebox(theme.widget_music)
+mpdicon:buttons(my_table.join(
+    awful.button({ modkey }, 1, function () awful.spawn.with_shell(musicplr) end),
+    --[[awful.button({ }, 1, function ()
+        awful.spawn.with_shell("mpc prev")
+        theme.mpd.update()
+    end),
+    awful.button({ }, 2, function ()
+        awful.spawn.with_shell("mpc toggle")
+        theme.mpd.update()
+    end),
+    awful.button({ modkey }, 3, function () awful.spawn.with_shell("pkill ncmpcpp") end),
+    awful.button({ }, 3, function ()
+        awful.spawn.with_shell("mpc stop")
+        theme.mpd.update()
+    end)))
+theme.mpd = lain.widget.mpd({
+    settings = function()
+        if mpd_now.state == "play" then
+            artist = " " .. mpd_now.artist .. " "
+            title  = mpd_now.title  .. " "
+            mpdicon:set_image(theme.widget_music_on)
+            widget:set_markup(markup.font(theme.font, markup("#FFFFFF", artist) .. " " .. title))
+        elseif mpd_now.state == "pause" then
+            widget:set_markup(markup.font(theme.font, " mpd paused "))
+            mpdicon:set_image(theme.widget_music_pause)
+        else
+            widget:set_text("")
+            mpdicon:set_image(theme.widget_music)
+        end
+    end
+})
+--]]
+#+END_SRC
+***** Memory
+#+BEGIN_SRC lua
+-- MEM
+local memicon = wibox.widget.imagebox(theme.widget_mem)
+local mem =
+    lain.widget.mem(
+    {
+        settings = function()
+            -- widget:set_markup(markup.font(theme.font, " " .. mem_now.used .. "MB "))
+            widget:set_markup(markup.font(theme.font, " " .. mem_now.perc .. "% "))
+        end
+    }
+)
+#+END_SRC
+***** CPU
+#+BEGIN_SRC lua
+-- CPU
+local cpuicon = wibox.widget.imagebox(theme.widget_cpu)
+local cpu =
+    lain.widget.cpu(
+    {
+        settings = function()
+            widget:set_markup(markup.font(theme.font, " " .. cpu_now.usage .. "% "))
+        end
+    }
+)
+#+END_SRC
+***** Temperature
+#+BEGIN_SRC lua
+--[[ Coretemp (lm_sensors, per core)
+local tempwidget = awful.widget.watch({awful.util.shell, '-c', 'sensors | grep Core'}, 30,
+function(widget, stdout)
+    local temps = ""
+    for line in stdout:gmatch("[^\r\n]+") do
+        temps = temps .. line:match("+(%d+).*°C")  .. "° " -- in Celsius
+    end
+    widget:set_markup(markup.font(theme.font, " " .. temps))
+end)
+--]]
+-- Coretemp (lain, average)
+local temp =
+    lain.widget.temp(
+    {
+        settings = function()
+            widget:set_markup(markup.font(theme.font, " " .. coretemp_now .. "°C "))
+        end
+    }
+)
+--]]
+local tempicon = wibox.widget.imagebox(theme.widget_temp)
+#+END_SRC
+***** Weather
+#+BEGIN_SRC lua
+--[[ Weather
+https://openweathermap.org/
+Type in the name of your city
+Copy/paste the city code in the URL to this file in city_id
+--]]
+local weathericon = wibox.widget.imagebox(theme.widget_weather)
+theme.weather =
+    lain.widget.weather(
+    {
+        city_id = 2803138, -- placeholder (Belgium)
+        notification_preset = {font = "Noto Sans Mono Medium 10", fg = theme.fg_normal},
+        weather_na_markup = markup.fontfg(theme.font, "#ffffff", "N/A "),
+        settings = function()
+            descr = weather_now["weather"][1]["description"]:lower()
+            units = math.floor(weather_now["main"]["temp"])
+            widget:set_markup(markup.fontfg(theme.font, "#ffffff", descr .. " @ " .. units .. "°C "))
+        end
+    }
+)
+#+END_SRC
+***** Filesystem
+#+BEGIN_SRC lua
+-- / fs
+local fsicon = wibox.widget.imagebox(theme.widget_hdd)
+--[[ commented because it needs Gio/Glib >= 2.54
+theme.fs = lain.widget.fs({
+    notification_preset = { fg = theme.fg_normal, bg = theme.bg_normal, font = "Noto Sans Mono Medium 10" },
+    settings = function()
+        local fsp = string.format(" %3.2f %s ", fs_now["/"].free, fs_now["/"].units)
+        widget:set_markup(markup.font(theme.font, fsp))
+    end
+})
+--]]
+
+#+END_SRC
+
+***** Battery
+
+#+BEGIN_SRC lua
+-- Battery
+
+
+local baticon = wibox.widget.imagebox(theme.widget_battery)
+#+END_SRC
+****** Awesome UPower Battery
+#+BEGIN_SRC lua
+local battery = require("awesome-upower-battery")
+
+local bat =
+    battery(
+    {
+        settings = function()
+            if bat_now.status and bat_now.status ~= "N/A" then
+                if bat_now.ac_status == 1 then
+                    widget:set_markup(markup.font(theme.font, " AC "))
+                    baticon:set_image(theme.widget_ac)
+                    return
+                elseif not bat_now.perc and tonumber(bat_now.perc) <= 5 then
+                    baticon:set_image(theme.widget_battery_empty)
+                elseif not bat_now.perc and tonumber(bat_now.perc) <= 15 then
+                    baticon:set_image(theme.widget_battery_low)
+                else
+                    baticon:set_image(theme.widget_battery)
+                end
+                widget:set_markup(markup.font(theme.font, " " .. bat_now.perc .. "% "))
+            else
+                widget:set_markup()
+                baticon:set_image(theme.widget_ac)
+            end
+        end
+    }
+)
+#+END_SRC
+
+
+****** Lain Battery
+#+BEGIN_SRC lua :tangle no
+local bat =
+    lain.widget.bat(
+    {
+        settings = function()
+            if bat_now.status and bat_now.status ~= "N/A" then
+                if bat_now.ac_status == 1 then
+                    widget:set_markup(markup.font(theme.font, " AC "))
+                    baticon:set_image(theme.widget_ac)
+                    return
+                elseif not bat_now.perc and tonumber(bat_now.perc) <= 5 then
+                    baticon:set_image(theme.widget_battery_empty)
+                elseif not bat_now.perc and tonumber(bat_now.perc) <= 15 then
+                    baticon:set_image(theme.widget_battery_low)
+                else
+                    baticon:set_image(theme.widget_battery)
+                end
+                widget:set_markup(markup.font(theme.font, " " .. bat_now.perc .. "% "))
+            else
+                widget:set_markup()
+                baticon:set_image(theme.widget_ac)
+            end
+        end
+    }
+)
+#+END_SRC
+
+***** The Rest
+
+#+BEGIN_SRC lua
+-- ALSA volume
+local volicon = wibox.widget.imagebox(theme.widget_vol)
+#+END_SRC
+****** Vanilla
+#+BEGIN_SRC lua :tangle no
+theme.volume =
+    lain.widget.alsa(
+    {
+        settings = function()
+            if volume_now.status == "off" then
+                volicon:set_image(theme.widget_vol_mute)
+            elseif tonumber(volume_now.level) == 0 then
+                volicon:set_image(theme.widget_vol_no)
+            elseif tonumber(volume_now.level) <= 50 then
+                volicon:set_image(theme.widget_vol_low)
+            else
+                volicon:set_image(theme.widget_vol)
+            end
+
+            widget:set_markup(markup.font(theme.font, " " .. volume_now.level .. "% "))
+        end
+    }
+)
+#+END_SRC
+******   Awesome Widgets
+#+BEGIN_SRC lua
+local volume_widget = require('awesome-wm-widgets.volume-widget.volume')
+
+theme.volume = volume_widget{
+  widget_type = "horizontal_bar",
+  with_icon = false,
+  bg_color = kanagawa.fujiWhite
+}
+#+END_SRC
+***** Network
+#+BEGIN_SRC lua
+-- Net
+local neticon = wibox.widget.imagebox(theme.widget_net)
+local net =
+    lain.widget.net(
+    {
+        settings = function()
+            widget:set_markup(
+                markup.fontfg(theme.font, "#FEFEFE", " " .. net_now.received .. " ↓↑ " .. net_now.sent .. " ")
+            )
+        end
+    }
+)
+
+#+END_SRC
+
+**** Helper Functions
+#+BEGIN_SRC lua
+
+-- Separators
+local arrow = separators.arrow_left
+
+function theme.powerline_rl(cr, width, height)
+    local arrow_depth, offset = height / 2, 0
+
+    -- Avoid going out of the (potential) clip area
+    if arrow_depth < 0 then
+        width = width + 2 * arrow_depth
+        offset = -arrow_depth
+    end
+
+    cr:move_to(offset + arrow_depth, 0)
+    cr:line_to(offset + width, 0)
+    cr:line_to(offset + width - arrow_depth, height / 2)
+    cr:line_to(offset + width, height)
+    cr:line_to(offset + arrow_depth, height)
+    cr:line_to(offset, height / 2)
+
+    cr:close_path()
+end
+
+local pl_color = {
+  kanagawa.waveBlue2,
+  kanagawa.sakuraPink,
+  kanagawa.autumnGreen,
+  kanagawa.roninYellow,
+  kanagawa.dragonBlue,
+  kanagawa.oniViolet,
+  kanagawa.springGreen
+                 }
+local pl_ind = 1
+
+local function pl(widget, bgcolor, padding)
+-- return wibox.container.background(wibox.container.margin(widget, dpi(16), dpi(16)), bgcolor, theme.powerline_rl)
+local color_ind = pl_ind
+local fg_ind = pl_ind
+  pl_ind = (pl_ind % 7) + 1
+
+
+  return wibox.container.background(
+    wibox.container.margin(
+      widget,
+      dpi(8),
+      dpi(8)
+    ),
+    pl_color[color_ind]
+    -- theme.powerline_rl
+  )
+end
+
+#+END_SRC
+
+#+RESULTS:
+
+**** Hooks
+#+BEGIN_SRC lua
+
+function theme.at_screen_connect(s)
+    -- Quake application
+    -- s.quake = lain.util.quake({ app = awful.util.terminal })
+    s.quake = lain.util.quake({app = "urxvt", height = 0.50, argname = "--name %s"})
+
+    -- If wallpaper is a function, call it with the screen
+    -- local wallpaper = theme.wallpaper
+    -- if type(wallpaper) == "function" then
+    --     wallpaper = wallpaper(s)
+    -- end
+    -- gears.wallpaper.maximized(wallpaper, s, true)
+
+    -- All tags open with layout 1
+    awful.tag(awful.util.tagnames, s, awful.layout.layouts[1])
+
+    -- Create a promptbox for each screen
+    s.mypromptbox = awful.widget.prompt()
+    -- Create an imagebox widget which will contains an icon indicating which layout we're using.
+    -- We need one layoutbox per screen.
+    s.mylayoutbox = awful.widget.layoutbox(s)
+    s.mylayoutbox:buttons(
+        my_table.join(
+            awful.button(
+                {},
+                1,
+                function()
+                    awful.layout.inc(1)
+                end
+            ),
+            awful.button(
+                {},
+                3,
+                function()
+                    awful.layout.inc(-1)
+                end
+            ),
+            awful.button(
+                {},
+                4,
+                function()
+                    awful.layout.inc(1)
+                end
+            ),
+            awful.button(
+                {},
+                5,
+                function()
+                    awful.layout.inc(-1)
+                end
+            )
+        )
+    )
+
+#+END_SRC
+***** Taglist
+#+BEGIN_SRC lua
+    -- Create a taglist widget
+    s.mytaglist = awful.widget.taglist(s, awful.widget.taglist.filter.all, awful.util.taglist_buttons)
+#+END_SRC
+***** Tasklist
+#+BEGIN_SRC lua
+    -- Create a tasklist widget
+    s.mytasklist = awful.widget.tasklist {
+      screen = s,
+      filter = awful.widget.tasklist.filter.currenttags,
+      buttons = awful.util.tasklist_buttons,
+      widget_template = {
+        {
+          {
+            id     = 'clienticon',
+            widget = awful.widget.clienticon,
+          },
+          margins = 1,
+          widget  = wibox.container.background,
+          id = 'background_role'
+        },
+        nil,
+        create_callback = function(self, c, index, objects) --luacheck: no unused args
+          self:get_children_by_id('clienticon')[1].client = c
+
+          -- BLING: Toggle the popup on hover and disable it off hover
+          self:connect_signal('mouse::enter', function()
+            awesome.emit_signal("bling::task_preview::visibility", s,
+                                true, c)
+          end)
+
+          self:connect_signal('mouse::leave', function()
+            awesome.emit_signal("bling::task_preview::visibility", s,
+                                false, c)
+          end)
+        end,
+        layout = wibox.layout.align.vertical,
+      },
+    }
+#+END_SRC
+***** Wibox
+#+BEGIN_SRC lua
+    -- Create the wibox
+    s.mywibox =
+      awful.wibar({position = "top", screen = s, height = dpi(26), bg = theme.bg_normal, fg = theme.fg_normal, border_width = dpi(4)})
+
+    -- Add widgets to the wibox
+    s.mywibox:setup {
+      layout = wibox.layout.fixed.vertical,
+      wibox.widget {
+        widget = wibox.widget.separator,
+        orientation = "horizontal",
+        forced_height = dpi(4),
+        thickness = dpi(4),
+        color = theme.topline_bg,
+        visible = true
+      },
+      wibox.widget{
+        layout = wibox.layout.align.horizontal,
+        expand = "none",
+        {
+          -- Right widgets
+          layout = wibox.layout.fixed.horizontal,
+          --[[ using shapes ]]--
+          --pl(wibox.widget { mpdicon, theme.mpd.widget, layout = wibox.layout.align.horizontal }, "#343434"),
+          --pl(task, "#343434"),
+          --pl(wibox.widget { mailicon, mail and theme.mail.widget, layout = wibox.layout.align.horizontal }, "#343434"),
+          pl(wibox.container.margin(clock, dpi(4), dpi(8)), "#777E76"),
+          pl(wibox.widget { baticon, bat.widget, layout = wibox.layout.align.horizontal }, "#8DAA9A"),
+          pl(wibox.widget { volicon, theme.volume, layout = wibox.layout.align.horizontal }, "#343434"),
+          pl(wibox.widget { memicon, mem.widget, layout = wibox.layout.align.horizontal }, "#777E76"),
+          --- pl(wibox.widget { cpuicon, cpu.widget, layout = wibox.layout.align.horizontal }, "#4B696D"),
+          -- pl(wibox.widget { tempicon, temp.widget, layout = wibox.layout.align.horizontal }, "#4B3B51"),
+          --pl(wibox.widget { fsicon, theme.fs and theme.fs.widget, layout = wibox.layout.align.horizontal }, "#CB755B"), --
+          pl(wibox.widget { neticon, net.widget, layout = wibox.layout.align.horizontal }, "#C0C0A2")
+        },
+        {
+          -- Left widgets
+          layout = wibox.layout.fixed.horizontal,
+          --spr,
+          s.mytaglist,
+          s.mypromptbox,
+          spr
+        },
+        {
+          layout = wibox.layout.fixed.horizontal,
+          s.mytasklist, -- Middle widget
+          wibox.widget.separator{orientation = "vertical", border_width = 0, forced_width = 2},
+          wibox.widget.systray(),
+          arrow( theme.bg_normal, theme.topline_bg),
+          s.mylayoutbox
+        }
+      }
+    }
+end
+
+return theme
+#+END_SRC
+
+#+RESULTS:
+
+* Picom
+This is a fairly standard Picom configuration.
+
+This uses picom-git, and uses features from that version.
+** Shadows
+
+| Property        | Description                                                            |
+|-----------------+------------------------------------------------------------------------|
+| shadow          | Enabled client-side shadows on windows. Note desktop                   |
+|                 | windows (windows with '_NET_WM_WINDOW_TYPE_DESKTOP') never get shadow, |
+|                 | unless explicitly requested using the wintypes option.                 |
+|-----------------+------------------------------------------------------------------------|
+| shadow-radius   | The blur radius for shadows, in pixels. (defaults to 12)               |
+|-----------------+------------------------------------------------------------------------|
+| shadow-opacity  | The opacity of shadows. (0.0 - 1.0, defaults to 0.75)                  |
+|-----------------+------------------------------------------------------------------------|
+| shadow-offset-x |                                                                        |
+
+#+BEGIN_SRC conf :tangle picom.conf
+shadow = true;
+shadow-radius = 40;
+shadow-opacity = .55;
+# shadow-offset-x = -15
+shadow-offset-x = -40;
+
+# The top offset for shadows, in pixels. (defaults to -15)
+# shadow-offset-y = -15
+shadow-offset-y = -20;
+
+# Avoid drawing shadows on dock/panel windows. This option is deprecated,
+# you should use the *wintypes* option in your config file instead.
+#
+# no-dock-shadow = false
+
+# Don't draw shadows on drag-and-drop windows. This option is deprecated,
+# you should use the *wintypes* option in your config file instead.
+#
+# no-dnd-shadow = false
+
+# Red color value of shadow (0.0 - 1.0, defaults to 0).
+# shadow-red = 0
+
+# Green color value of shadow (0.0 - 1.0, defaults to 0).
+# shadow-green = 0
+
+# Blue color value of shadow (0.0 - 1.0, defaults to 0).
+# shadow-blue = 0
+
+# Do not paint shadows on shaped windows. Note shaped windows
+# here means windows setting its shape through X Shape extension.
+# Those using ARGB background is beyond our control.
+# Deprecated, use
+#   shadow-exclude = 'bounding_shaped'
+# or
+#   shadow-exclude = 'bounding_shaped && !rounded_corners'
+# instead.
+#
+shadow-ignore-shaped = false
+
+# Specify a list of conditions of windows that should have no shadow.
+#
+# examples:
+#   shadow-exclude = "n:e:Notification";
+#
+# shadow-exclude = []
+shadow-exclude = [
+    "name = 'Notification'",
+    "class_g ?= 'Notify-osd'",
+    "name = 'Plank'",
+    "name = 'Docky'",
+    "name = 'Kupfer'",
+    "name = 'xfce4-notifyd'",
+    "name *= 'VLC'",
+    "name *= 'compton'",
+    "name *= 'Chromium'",
+    "name *= 'Chrome'",
+    "class_g = 'Firefox' && argb",
+    "class_g = 'Conky'",
+    "class_g = 'Kupfer'",
+    "class_g = 'Synapse'",
+    "class_g ?= 'Notify-osd'",
+    "class_g ?= 'Cairo-dock'",
+    "class_g = 'Cairo-clock'",
+    "class_g ?= 'Xfce4-notifyd'",
+    "class_g ?= 'Xfce4-power-manager'",
+   "_NET_WM_WINDOW_TYPE:a = '_NET_WM_WINDOW_TYPE_NOTIFICATION'",
+  "_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN'",
+  "_GTK_FRAME_EXTENTS@:c"
+];
+
+# Add this one too for ...
+    # "_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN'"
+# Add this one above to the list to have no shadow in Openbox menu
+	# "! name~=''",
+
+# Specify a X geometry that describes the region in which shadow should not
+# be painted in, such as a dock window region. Use
+#    shadow-exclude-reg = "x10+0+0"
+# for example, if the 10 pixels on the bottom of the screen should not have shadows painted on.
+#
+# shadow-exclude-reg = ""
+
+# Crop shadow of a window fully on a particular Xinerama screen to the screen.
+# xinerama-shadow-crop = false
+
+#+END_SRC
+** Fading
+#+BEGIN_SRC conf :tangle picom.conf
+#################################
+#           Fading              #
+#################################
+
+
+# Fade windows in/out when opening/closing and when opacity changes,
+#  unless no-fading-openclose is used.
+# fading = false
+fading = true
+
+# Opacity change between steps while fading in. (0.01 - 1.0, defaults to 0.028)
+# fade-in-step = 0.028
+fade-in-step = 0.03;
+
+# Opacity change between steps while fading out. (0.01 - 1.0, defaults to 0.03)
+# fade-out-step = 0.03
+fade-out-step = 0.03;
+
+# The time between steps in fade step, in milliseconds. (> 0, defaults to 10)
+fade-delta = 8
+
+# Specify a list of conditions of windows that should not be faded.
+# fade-exclude = []
+
+# Do not fade on window open/close.
+# no-fading-openclose = false
+
+# Do not fade destroyed ARGB windows with WM frame. Workaround of bugs in Openbox, Fluxbox, etc.
+# no-fading-destroyed-argb = false
+
+#+END_SRC
+** Opacity
+#+BEGIN_SRC conf :tangle picom.conf
+#################################
+#   Transparency / Opacity      #
+#################################
+
+
+# Opacity of inactive windows. (0.1 - 1.0, defaults to 1.0)
+# inactive-opacity = 1
+inactive-opacity = 1;
+
+# Opacity of window titlebars and borders. (0.1 - 1.0, disabled by default)
+# frame-opacity = 1.0
+# frame-opacity = .5;
+
+# Default opacity for dropdown menus and popup menus. (0.0 - 1.0, defaults to 1.0)
+# menu-opacity = 1.0
+
+# Let inactive opacity set by -i override the '_NET_WM_OPACITY' values of windows.
+# inactive-opacity-override = true
+inactive-opacity-override = false;
+
+# Default opacity for active windows. (0.0 - 1.0, defaults to 1.0)
+# active-opacity = 1.0
+
+# Dim inactive windows. (0.0 - 1.0, defaults to 0.0)
+# inactive-dim = 0.0
+
+# Specify a list of conditions of windows that should always be considered focused.
+# focus-exclude = []
+focus-exclude = [ "class_g = 'Cairo-clock'" ];
+
+# Use fixed inactive dim value, instead of adjusting according to window opacity.
+# inactive-dim-fixed = 1.0
+
+# Specify a list of opacity rules, in the format `PERCENT:PATTERN`,
+# like `50:name *= "Firefox"`. picom-trans is recommended over this.
+# Note we don't make any guarantee about possible conflicts with other
+# programs that set '_NET_WM_WINDOW_OPACITY' on frame or client windows.
+# example:
+#    opacity-rule = [ "80:class_g = 'URxvt'" ];
+#
+# opacity-rule = [ "80:class_g = 'Alacritty'" ]
+
+#+END_SRC
+** Background Blurring
+#+BEGIN_SRC conf :tangle picom.conf
+#################################
+#     Background-Blurring       #
+#################################
+
+
+# Parameters for background blurring, see the *BLUR* section for more information.
+blur-method = "dual_kawase"
+blur-size = 40
+#
+# blur-deviation = false
+
+# Blur background of semi-transparent / ARGB windows.
+# Bad in performance, with driver-dependent behavior.
+# The name of the switch may change without prior notifications.
+#
+blur-background = false
+
+# Blur background of windows when the window frame is not opaque.
+# Implies:
+#    blur-background
+# Bad in performance, with driver-dependent behavior. The name may change.
+#
+# blur-background-frame = true
+
+
+# Use fixed blur strength rather than adjusting according to window opacity.
+# blur-background-fixed = false
+
+
+# Specify the blur convolution kernel, with the following format:
+# example:
+   blur-kern = "5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1";
+#
+# blur-kern = ''
+# blur-kern = "3x3box";
+
+
+# Exclude conditions for background blur.
+# blur-background-exclude = []
+blur-background-exclude = [
+  "window_type = 'dock'",
+  "window_type = 'desktop'",
+  "_GTK_FRAME_EXTENTS@:c"
+];
+#+END_SRC
+** General Settings
+#+BEGIN_SRC conf :tangle picom.conf
+#################################
+#       General Settings        #
+#################################
+
+# Daemonize process. Fork to background after initialization. Causes issues with certain (badly-written) drivers.
+# daemon = false
+
+# Specify the backend to use: `xrender`, `glx`, or `xr_glx_hybrid`.
+# `xrender` is the default one.
+#
+# backend = "glx"
+# backend = "xr_glx_hybrid"
+backend = "xrender";
+
+# Enable/disable VSync.
+vsync = false
+#vsync = true
+
+# Enable remote control via D-Bus. See the *D-BUS API* section below for more details.
+# dbus = false
+
+# Try to detect WM windows (a non-override-redirect window with no
+# child that has 'WM_STATE') and mark them as active.
+#
+# mark-wmwin-focused = false
+mark-wmwin-focused = true;
+
+# Mark override-redirect windows that doesn't have a child window with 'WM_STATE' focused.
+# mark-ovredir-focused = false
+mark-ovredir-focused = true;
+
+# Try to detect windows with rounded corners and don't consider them
+# shaped windows. The accuracy is not very high, unfortunately.
+#
+# detect-rounded-corners = false
+detect-rounded-corners = false;
+
+# Detect '_NET_WM_OPACITY' on client windows, useful for window managers
+# not passing '_NET_WM_OPACITY' of client windows to frame windows.
+#
+# detect-client-opacity = false
+detect-client-opacity = true;
+
+# Specify refresh rate of the screen. If not specified or 0, picom will
+# try detecting this with X RandR extension.
+#
+# refresh-rate = 60
+refresh-rate = 0
+
+# Limit picom to repaint at most once every 1 / 'refresh_rate' second to
+# boost performance. This should not be used with
+#   vsync drm/opengl/opengl-oml
+# as they essentially does sw-opti's job already,
+# unless you wish to specify a lower refresh rate than the actual value.
+#
+# sw-opti =
+
+# Use EWMH '_NET_ACTIVE_WINDOW' to determine currently focused window,
+# rather than listening to 'FocusIn'/'FocusOut' event. Might have more accuracy,
+# provided that the WM supports it.
+#
+# use-ewmh-active-win = false
+
+# Unredirect all windows if a full-screen opaque window is detected,
+# to maximize performance for full-screen windows. Known to cause flickering
+# when redirecting/unredirecting windows.
+#
+# unredir-if-possible = false
+
+# Delay before unredirecting the window, in milliseconds. Defaults to 0.
+# unredir-if-possible-delay = 0
+
+# Conditions of windows that shouldn't be considered full-screen for unredirecting screen.
+# unredir-if-possible-exclude = []
+
+# Use 'WM_TRANSIENT_FOR' to group windows, and consider windows
+# in the same group focused at the same time.
+#
+# detect-transient = false
+detect-transient = true
+
+# Use 'WM_CLIENT_LEADER' to group windows, and consider windows in the same
+# group focused at the same time. 'WM_TRANSIENT_FOR' has higher priority if
+# detect-transient is enabled, too.
+#
+# detect-client-leader = false
+detect-client-leader = true
+
+# Resize damaged region by a specific number of pixels.
+# A positive value enlarges it while a negative one shrinks it.
+# If the value is positive, those additional pixels will not be actually painted
+# to screen, only used in blur calculation, and such. (Due to technical limitations,
+# with use-damage, those pixels will still be incorrectly painted to screen.)
+# Primarily used to fix the line corruption issues of blur,
+# in which case you should use the blur radius value here
+# (e.g. with a 3x3 kernel, you should use `--resize-damage 1`,
+# with a 5x5 one you use `--resize-damage 2`, and so on).
+# May or may not work with *--glx-no-stencil*. Shrinking doesn't function correctly.
+#
+# resize-damage = 1
+
+# Specify a list of conditions of windows that should be painted with inverted color.
+# Resource-hogging, and is not well tested.
+#
+# invert-color-include = []
+
+# GLX backend: Avoid using stencil buffer, useful if you don't have a stencil buffer.
+# Might cause incorrect opacity when rendering transparent content (but never
+# practically happened) and may not work with blur-background.
+# My tests show a 15% performance boost. Recommended.
+#
+# glx-no-stencil = false
+
+# GLX backend: Avoid rebinding pixmap on window damage.
+# Probably could improve performance on rapid window content changes,
+# but is known to break things on some drivers (LLVMpipe, xf86-video-intel, etc.).
+# Recommended if it works.
+#
+# glx-no-rebind-pixmap = false
+
+# Disable the use of damage information.
+# This cause the whole screen to be redrawn everytime, instead of the part of the screen
+# has actually changed. Potentially degrades the performance, but might fix some artifacts.
+# The opposing option is use-damage
+#
+# no-use-damage = false
+use-damage = true
+
+# Use X Sync fence to sync clients' draw calls, to make sure all draw
+# calls are finished before picom starts drawing. Needed on nvidia-drivers
+# with GLX backend for some users.
+#
+# xrender-sync-fence = false
+
+# GLX backend: Use specified GLSL fragment shader for rendering window contents.
+# See `compton-default-fshader-win.glsl` and `compton-fake-transparency-fshader-win.glsl`
+# in the source tree for examples.
+#
+# glx-fshader-win = ''
+
+# Force all windows to be painted with blending. Useful if you
+# have a glx-fshader-win that could turn opaque pixels transparent.
+#
+# force-win-blend = false
+
+# Do not use EWMH to detect fullscreen windows.
+# Reverts to checking if a window is fullscreen based only on its size and coordinates.
+#
+# no-ewmh-fullscreen = false
+
+# Dimming bright windows so their brightness doesn't exceed this set value.
+# Brightness of a window is estimated by averaging all pixels in the window,
+# so this could comes with a performance hit.
+# Setting this to 1.0 disables this behaviour. Requires --use-damage to be disabled. (default: 1.0)
+#
+# max-brightness = 1.0
+
+# Make transparent windows clip other windows like non-transparent windows do,
+# instead of blending on top of them.
+#
+# transparent-clipping = false
+
+# Set the log level. Possible values are:
+#  "trace", "debug", "info", "warn", "error"
+# in increasing level of importance. Case doesn't matter.
+# If using the "TRACE" log level, it's better to log into a file
+# using *--log-file*, since it can generate a huge stream of logs.
+#
+# log-level = "debug"
+log-level = "warn";
+
+# Set the log file.
+# If *--log-file* is never specified, logs will be written to stderr.
+# Otherwise, logs will to written to the given file, though some of the early
+# logs might still be written to the stderr.
+# When setting this option from the config file, it is recommended to use an absolute path.
+#
+# log-file = '~/.config/compton.log'
+
+# Show all X errors (for debugging)
+# show-all-xerrors = false
+
+# Write process ID to a file.
+# write-pid-path = '/path/to/your/log/file'
+
+# Window type settings
+#
+# 'WINDOW_TYPE' is one of the 15 window types defined in EWMH standard:
+#     "unknown", "desktop", "dock", "toolbar", "menu", "utility",
+#     "splash", "dialog", "normal", "dropdown_menu", "popup_menu",
+#     "tooltip", "notification", "combo", and "dnd".
+#
+# Following per window-type options are available: ::
+#
+#   fade, shadow:::
+#     Controls window-type-specific shadow and fade settings.
+#
+#   opacity:::
+#     Controls default opacity of the window type.
+#
+#   focus:::
+#     Controls whether the window of this type is to be always considered focused.
+#     (By default, all window types except "normal" and "dialog" has this on.)
+#
+#   full-shadow:::
+#     Controls whether shadow is drawn under the parts of the window that you
+#     normally won't be able to see. Useful when the window has parts of it
+#     transparent, and you want shadows in those areas.
+#
+#   redir-ignore:::
+#     Controls whether this type of windows should cause screen to become
+#     redirected again after been unredirected. If you have unredir-if-possible
+#     set, and doesn't want certain window to cause unnecessary screen redirection,
+#     you can set this to `true`.
+#
+#+END_SRC
+** Custom Definitions
+#+BEGIN_SRC conf :tangle picom.conf
+wintypes:
+{
+  tooltip = { fade = true; shadow = true; opacity = 0.9; focus = true; full-shadow = false; };
+  dock = { shadow = false; }
+  dnd = { shadow = false; }
+  popup_menu = { opacity = 0.9; }
+  dropdown_menu = { opacity = 0.9; }
+};
+#+END_SRC
+
+* Autostart
+#+BEGIN_SRC sh :tangle autostart.sh
+#!/bin/bash
+
+function run {
+  if ! pgrep $1 ;
+  then
+    $@&
+  fi
+}
+#run dex $HOME/.config/autostart/arcolinux-welcome-app.desktop
+#run xrandr --output VGA-1 --primary --mode 1360x768 --pos 0x0 --rotate normal
+#run xrandr --output HDMI2 --mode 1920x1080 --pos 1920x0 --rotate normal --output HDMI1 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output VIRTUAL1 --off
+#autorandr horizontal
+run nm-applet
+#run caffeine
+#run variety
+run xfce4-power-manager
+run blueberry-tray
+run /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+run numlockx on
+run volumeicon
+run nitrogen --restore
+#run conky -c $HOME/.config/awesome/system-overview
+#you can set wallpapers in themes as well
+#feh --bg-fill /usr/share/backgrounds/arcolinux/arco-wallpaper.jpg &
+#run applications from startup
+#run firefox
+#run atom
+#run dropbox
+#run insync start
+run spotify
+#run ckb-next -b
+run discord
+run mailspring
+#run telegram-desktop
+run flameshot
+# run qbittorrent
+# run calibre
+run nextcloud
+run fcitx5 -d
+
+#+END_SRC
+
+#+RESULTS:

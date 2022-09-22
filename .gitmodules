@@ -1,0 +1,15 @@
+[submodule "/home/maespera/.config/awesome/bling"]
+	path = /home/maespera/.config/awesome/bling
+	url = https://github.com/BlingCorp/bling.git
+[submodule "/home/maespera/.config/awesome/nice"]
+	path = /home/maespera/.config/awesome/nice
+	url = https://github.com/mut-ex/awesome-wm-nice
+[submodule "/home/maespera/.config/awesome/awesome-upower-battery"]
+	path = /home/maespera/.config/awesome/awesome-upower-battery
+	url = https://github.com/berlam/awesome-upower-battery.git
+[submodule "/home/maespera/.config/awesome/light"]
+	path = /home/maespera/.config/awesome/light
+	url = https://github.com/troglobit/awesome-light
+[submodule "/home/maespera/.config/awesome/awesome-wm-widgets"]
+	path = /home/maespera/.config/awesome/awesome-wm-widgets
+	url = https://github.com/streetturtle/awesome-wm-widgets
