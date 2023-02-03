@@ -8,10 +8,12 @@
  */
 
 configuration {
-	font:							"Noto Sans Bold 10";
+	font:							"Iosevka NerdFont 12";
     show-icons:                     true;
-	icon-theme: 					"Papirus";
+	icon-theme: 					"ArocLinux Candy Beauty";
     display-drun: 					"";
+    display-window: "";
+    display-run: "";
     display-file-browser-extended:  "Edit Config";
     drun-display-format:            "{name}";
     disable-history:                false;

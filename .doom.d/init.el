@@ -15,6 +15,7 @@
 ;;      directory (for easy access to its source code).
 
 (doom! :input
+       ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
        ;;chinese
        japanese
        ;;layout            ; auie,ctsrnm is the superior home row
@@ -45,7 +46,7 @@
        ;;tabs              ; a tab bar for Emacs
        treemacs          ; a project drawer, like neotree but cooler
        ;;unicode           ; extended unicode support for various languages
-       vc-gutter         ; vcs diff in the fringe
+       (vc-gutter +pretty) ; vcs diff in the fringe
        vi-tilde-fringe   ; fringe tildes to mark beyond EOB
        ;;window-select     ; visually switch windows
        workspaces        ; tab emulation, persistence & separate workspaces
@@ -55,10 +56,10 @@
        (evil +everywhere); come to the dark side, we have cookies
        file-templates    ; auto-snippets for empty files
        fold              ; (nigh) universal code folding
-       (format +onsave)  ; automated prettiness
+       ;;(format +onsave)  ; automated prettiness
        ;;god               ; run Emacs commands without modifier keys
        ;;lispy             ; vim for lisp, for people who don't like vim
-       multiple-cursors  ; editing in many places at once
+       ;;multiple-cursors  ; editing in many places at once
        ;;objed             ; text object editing for the innocent
        ;;parinfer          ; turn lisp into python, sort of
        ;;rotate-text       ; cycle region at point between text candidates
@@ -88,7 +89,7 @@
        ;;biblio            ; Writes a PhD for you (citation needed)
        ;;debugger          ; FIXME stepping through code, to help you add bugs
        ;;direnv
-       docker
+       ;;docker
        ;;editorconfig      ; let someone else argue about tabs vs spaces
        ;;ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
@@ -98,7 +99,7 @@
        magit             ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
-       ;;pdf               ; pdf enhancements
+       pdf               ; pdf enhancements
        ;;prodigy           ; FIXME managing external services & code builders
        ;;rgb               ; creating color strings
        ;;taskrunner        ; taskrunner for all your projects
@@ -137,7 +138,7 @@
        ;;(haskell +lsp)    ; a language that's lazier than I am
        ;;hy                ; readability of scheme w/ speed of python
        ;;idris             ; a language you can depend on
-       ;;json              ; At least it ain't XML
+       json              ; At least it ain't XML
        ;;(java +lsp)       ; the poster child for carpal tunnel syndrome
        javascript        ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia             ; a better, faster MATLAB
@@ -189,58 +190,3 @@
        :config
        ;;literate
        (default +bindings +smartparens))
-
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize))
-
-(setq org-caldav-url "http://cloud.mth-lily.com/remote.php/dav/calendars/MTHLily")
-(setq org-caldav-calendar-id "school")
-(setq org-caldav-inbox "~/org/school-cal.org")
-
-(setq org-caldav-calendars
-      '(
-        (
-         :calendar-id "school"
-         :url "http://cloud.mth-lily.com/remote.php/dav/calendars/MTHLily"
-         :inbox "~/org/school-cal.org"
-         :sync-direction: cal->org
-        )
-        ;(
-        ; :calendar-id "sonarr.ics"
-        ; :url "~/calendars"
-        ; :inbox "~/org/sonarr.org")
-        ; :sync-direction: cal->org
-        ;)
-        )
-      )
-
-(defun my-open-calendar ()
-  (interactive)
-  (cfw:open-calendar-buffer
-   :contents-sources
-   (list
-    ;;(cfw:org-create-source "Green")  ; org-agenda source
-    ;;(cfw:org-create-file-source "cal" "~/org/calendar.org" "Cyan")  ; other org source
-    ;;(cfw:howm-create-source "Blue")  ; howm source
-    ;;(cfw:cal-create-source "Orange") ; diary source
-    ;;(cfw:ical-create-source "Moon" "~/moon.ics" "Gray")  ; ICS source1
-    ;;(cfw:ical-create-source "gcal" "https://..../basic.ics" "IndianRed") ; google calendar ICS
-    (cfw:org-create-file-source "Synced Calendar" "~/org/school-cal.org" "Blue")
-    (cfw:org-create-file-source "My Todos" "~/org/todo.org" "Green")
-    (cfw:org-create-file-source "Habits" "~/org/habits.org" "Red")
-    ;;(cfw:ical-create-source "School (NC)" "http://cloud.mth-lily.com/remote.php/dav/calendars/MTHLily/school" "IndianRed")
-    ;;(cfw:ical-create-source "Sonarr" "~/calendars/sonarr.ics" "Green")
-    (cfw:ical-create-source "Sonarr" "http://sonarr.mth-lily.com/sonarr/feed/calendar/Sonarr.ics?apikey=6c1428b946594544b2451e6ada2e05ab" "Green")
-    )
-   )
-  )
-
-(setq org-log-into-drawer "LOGBOOK"
-      org-habit-preceding-days 21
-      org-habit-show-habits t
-      org-habit-show-habits-only-for-today t
-      org-habit-show-all-today t
-      org-habit-graph-column 40
- )
-;(after! org
-;  (add-to-list 'org-modules 'org-habit))

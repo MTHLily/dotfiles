@@ -16,9 +16,9 @@ local theme = {}
 theme.confdir = os.getenv("HOME") .. "/.config/awesome/themes/multicolor"
 -- theme.wallpaper                                 = theme.confdir .. "/wallpaper.jpg"
 -- theme.wallpaper                                 = "/usr/share/backgrounds/arcolinux/arco-wallpaper.jpg"
-theme.font = "Iosevka 11"
-theme.taglist_font = "Iosevka 11"
-theme.taglist_spacing = 0
+theme.font = "Iosevka 12"
+theme.taglist_font = "Iosevka 20"
+theme.taglist_spacing = 2
 -- theme.taglist_shape                             = wibox.
 theme.menu_bg_normal = "#000000aa"
 theme.menu_bg_focus = "#000000aa"
@@ -34,7 +34,7 @@ theme.border_width = dpi(2)
 theme.border_normal = "#1c2022"
 theme.border_focus = "#12674a"
 theme.border_marked = "#3ca4d8"
---theme.border_marked = "#12674a"
+-- theme.border_marked = "#12674a"
 theme.menu_border_width = 0
 theme.menu_height = dpi(25)
 theme.menu_width = dpi(260)
@@ -150,27 +150,27 @@ theme.fs = lain.widget.fs({
 --]]
 
 -- Mail IMAP check
---[[ commented because it needs to be set before use
+-- --[[ commented because it needs to be set before use
 local mailicon = wibox.widget.imagebox()
 theme.mail = lain.widget.imap({
-    timeout  = 180,
-    server   = "server",
-    mail     = "mail",
-    password = "keyring get mail",
+    timeout = 180,
+    server = "imap.gmail.com",
+    mail = "mth.maespera@gmail.com",
+    password = "50u.|0fF1r3",
     settings = function()
         if mailcount > 0 then
             mailicon:set_image(theme.widget_mail)
             widget:set_markup(markup.fontfg(theme.font, "#cccccc", mailcount .. " "))
         else
             widget:set_text("")
-            --mailicon:set_image() -- not working in 4.0
+            -- mailicon:set_image() -- not working in 4.0
             mailicon._private.image = nil
             mailicon:emit_signal("widget::redraw_needed")
             mailicon:emit_signal("widget::layout_changed")
         end
     end
 })
---]]
+-- ]]
 
 -- CPU
 local cpuicon = wibox.widget.imagebox(theme.widget_cpu)
@@ -239,9 +239,6 @@ function ip_line()
     end
 end
 
-local myipaddress = wibox.widget.textbox()
-myipaddress:set_markup(markup.fontfg(theme.font, "#e8ac9b", "IP: " .. ip_line()))
-
 -- MEM
 local memicon = wibox.widget.imagebox(theme.widget_mem)
 local memory = lain.widget.mem({
@@ -287,7 +284,6 @@ theme.mpd = lain.widget.mpd({
 
 function theme.at_screen_connect(s)
     -- Quake application
-    -- s.quake = lain.util.quake({ app = awful.util.terminal })
     s.terminaldropdown = lain.util.quake({
         app = "alacritty",
         argname = '--class %s',
@@ -348,13 +344,12 @@ function theme.at_screen_connect(s)
 
     local long = { -- Right widgets
         layout = wibox.layout.fixed.horizontal,
-        -- mailicon,
-        -- mail.widget,
+        mailicon,
+        theme.mail.widget,
         netdownicon,
         netdowninfo,
         netupicon,
         netupinfo.widget,
-        myipaddress,
         volicon,
         theme.volume.widget,
         memicon,
@@ -365,8 +360,8 @@ function theme.at_screen_connect(s)
         -- theme.weather.widget,
         -- tempicon,
         -- temp.widget,
-        -- baticon,
-        -- bat.widget,
+        baticon,
+        bat.widget,
         clockicon,
         mytextclock
     }
@@ -380,33 +375,18 @@ function theme.at_screen_connect(s)
     }
 
     -- Add widgets to the wibox
-    if s.index == 1 then
-        s.mywibox:setup{
-            layout = wibox.layout.align.horizontal,
-            { -- Left widgets
-                layout = wibox.layout.fixed.horizontal,
-                -- s.mylayoutbox,
-                s.mytaglist,
-                s.mypromptbox
-            },
-            -- s.mytasklist, -- Middle widget
-            nil,
-            long
-        }
-    else
-        s.mywibox:setup{
-            layout = wibox.layout.align.horizontal,
-            { -- Left widgets
-                layout = wibox.layout.fixed.horizontal,
-                -- s.mylayoutbox,
-                s.mytaglist,
-                s.mypromptbox
-            },
-            -- s.mytasklist, -- Middle widget
-            nil,
-            short
-        }
-    end
+    s.mywibox:setup{
+        layout = wibox.layout.align.horizontal,
+        { -- Left widgets
+            layout = wibox.layout.fixed.horizontal,
+            -- s.mylayoutbox,
+            s.mytaglist,
+            s.mypromptbox
+        },
+        -- s.mytasklist, -- Middle widget
+        nil,
+        long
+    }
     -- Create the bottom wibox
     s.mybottomwibox = awful.wibar({
         position = "bottom",

@@ -262,6 +262,7 @@ nice {
   titlebar_color = beautiful.titlebar_bg_normal,
   titlebar_radius = 0,
   filterClients = awful.widget.tasklist.filter.alltags,
+  titlebar_font = "Iosevka 12",
   tooltip_messages = {
     close = "close",
     minimize = "minimize",
@@ -783,7 +784,7 @@ globalkeys =
     -- {description = "htop", group = "super"}),
     awful.key(
         {modkey},
-        ".",
+        ",",
         function()
             awful.spawn.with_shell("splatmoji type")
         end,
@@ -2696,6 +2697,7 @@ theme.widget_scissors = theme.dir .. "/icons/scissors.png"
 theme.widget_weather = theme.dir .. "/icons/dish.png"
 theme.tasklist_plain_task_name = false
 theme.tasklist_disable_icon = false
+theme.bg_systray = theme.topline_bg
 theme.useless_gap = dpi(2)
 
 local markup = lain.util.markup
@@ -3092,7 +3094,7 @@ theme.volume = volume_widget{
   with_icon = false,
   bg_color = kanagawa.fujiWhite
 }
-#+END_SRC
+#+END_SR
 ***** Network
 #+BEGIN_SRC lua
 -- Net
@@ -3160,7 +3162,7 @@ local fg_ind = pl_ind
       dpi(8)
     ),
     pl_color[color_ind]
-    -- theme.powerline_rl
+    theme.powerline_rl
   )
 end
 
@@ -3315,7 +3317,6 @@ function theme.at_screen_connect(s)
           s.mytasklist, -- Middle widget
           wibox.widget.separator{orientation = "vertical", border_width = 0, forced_width = 2},
           wibox.widget.systray(),
-          arrow( theme.bg_normal, theme.topline_bg),
           s.mylayoutbox
         }
       }
@@ -3829,7 +3830,7 @@ run flameshot
 # run calibre
 run nextcloud
 run fcitx5 -d
-
+run klipper
 #+END_SRC
 
 #+RESULTS:

@@ -23,7 +23,7 @@
   :group 'katsushika-theme
   :type 'boolean)
 
-(defcustom doom-tokyo-night-brighter-comments nil
+(defcustom doom-tokyo-night-brighter-comments t
   "If non-nil, comments will be highlighted in more vivid colors."
   :group 'katsushika-theme
   :type 'boolean)

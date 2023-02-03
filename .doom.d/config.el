@@ -40,7 +40,7 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setq org-directory "/home/maespera/org/")
 (setq shell-file-name "/bin/bash")
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
@@ -81,22 +81,16 @@
 )
 
 (add-hook 'org-mode-hook 'org-auto-tangle-mode)
-(setq fancy-splash-image "~/.doom.d/themes/assets/hakunon.png")
+(setq fancy-splash-image "/home/maespera/.doom.d/themes/assets/hakunon.png")
 
-(setq org-agenda-files '("~/org" "~/org/roam" "~/org/roam/daily"))
+(defun doom/ediff-init-and-example ()
+  "ediff the current `init.el' with the example in doom-emacs-dir"
+  (interactive)
+  (ediff-files (concat doom-user-dir "init.el")
+               (concat doom-emacs-dir "init.example.el")))
 
+(define-key! help-map
+  "di"   #'doom/ediff-init-and-example
+  )
 
-(use-package! websocket
-    :after org-roam)
-
-(use-package! org-roam-ui
-    :after org-roam ;; or :after org
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
-;;  :hook (after-init . org-roam-ui-mode)
-    :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
+(load! "org-user-config")

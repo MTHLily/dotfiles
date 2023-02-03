@@ -37,3 +37,4 @@ run flameshot
 # run calibre
 run nextcloud
 run fcitx5 -d
+run klipper

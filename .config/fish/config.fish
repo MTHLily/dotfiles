@@ -16,7 +16,7 @@ alias sail="[ -f sail ] && bash sail || bash vendor/bin/sail"
 alias sa="sail artisan"
 alias sap="sail php"
 alias pa="php artisan"
-alias ls="exa -al --icons"
+alias ls="exa -al --icons --group-directories-first"
 alias vim="nvim"
 alias sc="sudo systemctl"
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
@@ -28,3 +28,5 @@ export GTK_IM_MODULE='fcitx'
 export QT_IM_MODULE='fcitx'
 export SDL_IM_MODULE='fcitx'
 export XMODIFIERS='@im=fcitx'
+
+direnv hook fish | source
