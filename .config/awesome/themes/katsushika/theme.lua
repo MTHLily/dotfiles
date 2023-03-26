@@ -53,12 +53,9 @@ kanagawa.surimiOrange = "#FFA066"
 kanagawa.katanaGray = "#717C7C"
 
 local theme = {}
-theme.naughty_preset = {}
+-- theme.naughty_preset = {}
 
-theme.naughty_preset.normal = {
-    bg = kanagawa.sumiInk1,
-    fg = kanagawa.fujiWhite
-}
+-- theme.naughty_preset.normal = {bg = kanagawa.sumiInk1, fg = kanagawa.fujiWhite}
 
 theme.dir = os.getenv("HOME") .. "/.config/awesome/themes/powerarrow"
 theme.wallpaper = theme.dir .. "/wallpaper.jpg"
@@ -158,7 +155,8 @@ theme.window_switcher_icon_width = 40 -- The width of one icon
 
 -- Textclock
 local clockicon = wibox.widget.imagebox(theme.widget_clock)
-local clock = awful.widget.watch("date +'%d %b %I:%M'", 60, function(widget, stdout)
+local clock = awful.widget.watch("date +'%d %b %I:%M'", 60,
+                                 function(widget, stdout)
     widget:set_markup(" " .. markup.font(theme.font, stdout))
 end)
 
@@ -175,12 +173,8 @@ local cw = calendar_widget({
     previous_month_button = 1,
     next_month_button = 3
 })
-clock:connect_signal("mouse::enter", function(_, _, _, button)
-    cw.toggle()
-end)
-clock:connect_signal("mouse::leave", function(_, _, _, button)
-    cw.toggle()
-end)
+clock:connect_signal("mouse::enter", function(_, _, _, button) cw.toggle() end)
+clock:connect_signal("mouse::leave", function(_, _, _, button) cw.toggle() end)
 
 -- Taskwarrior
 -- local task = wibox.widget.imagebox(theme.widget_task)
@@ -214,10 +208,7 @@ theme.mail = lain.widget.imap({
 -- ALSA volume
 theme.volume = lain.widget.alsabar({
     -- togglechannel = "IEC958,3",
-    notification_preset = {
-        font = theme.font,
-        fg = theme.fg_normal
-    }
+    notification_preset = {font = theme.font, fg = theme.fg_normal}
 })
 
 --[[
@@ -291,7 +282,8 @@ local bat = battery({
             else
                 baticon:set_image(theme.widget_battery)
             end
-            widget:set_markup(markup.font(theme.font, " " .. bat_now.perc .. "% "))
+            widget:set_markup(markup.font(theme.font,
+                                          " " .. bat_now.perc .. "% "))
         else
             widget:set_markup()
             baticon:set_image(theme.widget_ac)
@@ -315,8 +307,9 @@ theme.volume = volume_widget {
 local neticon = wibox.widget.imagebox(theme.widget_net)
 local net = lain.widget.net({
     settings = function()
-        widget:set_markup(markup.fontfg(theme.font, "#FEFEFE",
-            " " .. net_now.received .. " ↓↑ " .. net_now.sent .. " "))
+        widget:set_markup(markup.fontfg(theme.font, "#FEFEFE", " " ..
+                                            net_now.received .. " ↓↑ " ..
+                                            net_now.sent .. " "))
     end
 })
 
@@ -345,7 +338,8 @@ end
 local function pl(widget, bgcolor, padding)
     -- return  wibox.container.background(wibox.container.margin(widget, dpi(16), dpi(16)), bgcolor, theme.powerline_rl)
 
-    return wibox.container.background(wibox.container.margin(widget, dpi(8), dpi(2)) -- pl_color[color_ind],
+    return wibox.container.background(wibox.container.margin(widget, dpi(8),
+                                                             dpi(2)) -- pl_color[color_ind],
     --  theme.powerline_rl
     )
 end
@@ -366,16 +360,14 @@ function theme.at_screen_connect(s)
     s.mylayoutbox = awful.widget.layoutbox(s)
     s.mylayoutbox:buttons(my_table.join(awful.button({}, 1, function()
         awful.layout.inc(1)
-    end), awful.button({}, 3, function()
-        awful.layout.inc(-1)
-    end), awful.button({}, 4, function()
+    end), awful.button({}, 3, function() awful.layout.inc(-1) end),
+                                        awful.button({}, 4, function()
         awful.layout.inc(1)
-    end), awful.button({}, 5, function()
-        awful.layout.inc(-1)
-    end)))
+    end), awful.button({}, 5, function() awful.layout.inc(-1) end)))
 
     -- Create a taglist widget
-    s.mytaglist = awful.widget.taglist(s, awful.widget.taglist.filter.all, awful.util.taglist_buttons)
+    s.mytaglist = awful.widget.taglist(s, awful.widget.taglist.filter.all,
+                                       awful.util.taglist_buttons)
     if s.geometry.width > s.geometry.height then
 
         -- All tags open with layout 1
@@ -458,11 +450,13 @@ function theme.at_screen_connect(s)
 
                 -- BLING: Toggle the popup on hover and disable it off hover
                 self:connect_signal('mouse::enter', function()
-                    awesome.emit_signal("bling::task_preview::visibility", self, true, c)
+                    awesome.emit_signal("bling::task_preview::visibility", self,
+                                        true, c)
                 end)
 
                 self:connect_signal('mouse::leave', function()
-                    awesome.emit_signal("bling::task_preview::visibility", self, false, c)
+                    awesome.emit_signal("bling::task_preview::visibility", self,
+                                        false, c)
                 end)
             end,
             layout = wibox.layout.align.vertical

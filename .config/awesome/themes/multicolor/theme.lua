@@ -77,34 +77,55 @@ theme.layout_max = theme.confdir .. "/icons/max.png"
 theme.layout_fullscreen = theme.confdir .. "/icons/fullscreen.png"
 theme.layout_magnifier = theme.confdir .. "/icons/magnifier.png"
 theme.layout_floating = theme.confdir .. "/icons/floating.png"
-theme.titlebar_close_button_normal = theme.confdir .. "/icons/titlebar/close_normal.png"
-theme.titlebar_close_button_focus = theme.confdir .. "/icons/titlebar/close_focus.png"
-theme.titlebar_minimize_button_normal = theme.confdir .. "/icons/titlebar/minimize_normal.png"
-theme.titlebar_minimize_button_focus = theme.confdir .. "/icons/titlebar/minimize_focus.png"
-theme.titlebar_ontop_button_normal_inactive = theme.confdir .. "/icons/titlebar/ontop_normal_inactive.png"
-theme.titlebar_ontop_button_focus_inactive = theme.confdir .. "/icons/titlebar/ontop_focus_inactive.png"
-theme.titlebar_ontop_button_normal_active = theme.confdir .. "/icons/titlebar/ontop_normal_active.png"
-theme.titlebar_ontop_button_focus_active = theme.confdir .. "/icons/titlebar/ontop_focus_active.png"
-theme.titlebar_sticky_button_normal_inactive = theme.confdir .. "/icons/titlebar/sticky_normal_inactive.png"
-theme.titlebar_sticky_button_focus_inactive = theme.confdir .. "/icons/titlebar/sticky_focus_inactive.png"
-theme.titlebar_sticky_button_normal_active = theme.confdir .. "/icons/titlebar/sticky_normal_active.png"
-theme.titlebar_sticky_button_focus_active = theme.confdir .. "/icons/titlebar/sticky_focus_active.png"
-theme.titlebar_floating_button_normal_inactive = theme.confdir .. "/icons/titlebar/floating_normal_inactive.png"
-theme.titlebar_floating_button_focus_inactive = theme.confdir .. "/icons/titlebar/floating_focus_inactive.png"
-theme.titlebar_floating_button_normal_active = theme.confdir .. "/icons/titlebar/floating_normal_active.png"
-theme.titlebar_floating_button_focus_active = theme.confdir .. "/icons/titlebar/floating_focus_active.png"
-theme.titlebar_maximized_button_normal_inactive = theme.confdir .. "/icons/titlebar/maximized_normal_inactive.png"
-theme.titlebar_maximized_button_focus_inactive = theme.confdir .. "/icons/titlebar/maximized_focus_inactive.png"
-theme.titlebar_maximized_button_normal_active = theme.confdir .. "/icons/titlebar/maximized_normal_active.png"
-theme.titlebar_maximized_button_focus_active = theme.confdir .. "/icons/titlebar/maximized_focus_active.png"
+theme.titlebar_close_button_normal = theme.confdir ..
+                                         "/icons/titlebar/close_normal.png"
+theme.titlebar_close_button_focus = theme.confdir ..
+                                        "/icons/titlebar/close_focus.png"
+theme.titlebar_minimize_button_normal = theme.confdir ..
+                                            "/icons/titlebar/minimize_normal.png"
+theme.titlebar_minimize_button_focus = theme.confdir ..
+                                           "/icons/titlebar/minimize_focus.png"
+theme.titlebar_ontop_button_normal_inactive = theme.confdir ..
+                                                  "/icons/titlebar/ontop_normal_inactive.png"
+theme.titlebar_ontop_button_focus_inactive = theme.confdir ..
+                                                 "/icons/titlebar/ontop_focus_inactive.png"
+theme.titlebar_ontop_button_normal_active = theme.confdir ..
+                                                "/icons/titlebar/ontop_normal_active.png"
+theme.titlebar_ontop_button_focus_active = theme.confdir ..
+                                               "/icons/titlebar/ontop_focus_active.png"
+theme.titlebar_sticky_button_normal_inactive = theme.confdir ..
+                                                   "/icons/titlebar/sticky_normal_inactive.png"
+theme.titlebar_sticky_button_focus_inactive = theme.confdir ..
+                                                  "/icons/titlebar/sticky_focus_inactive.png"
+theme.titlebar_sticky_button_normal_active = theme.confdir ..
+                                                 "/icons/titlebar/sticky_normal_active.png"
+theme.titlebar_sticky_button_focus_active = theme.confdir ..
+                                                "/icons/titlebar/sticky_focus_active.png"
+theme.titlebar_floating_button_normal_inactive = theme.confdir ..
+                                                     "/icons/titlebar/floating_normal_inactive.png"
+theme.titlebar_floating_button_focus_inactive = theme.confdir ..
+                                                    "/icons/titlebar/floating_focus_inactive.png"
+theme.titlebar_floating_button_normal_active = theme.confdir ..
+                                                   "/icons/titlebar/floating_normal_active.png"
+theme.titlebar_floating_button_focus_active = theme.confdir ..
+                                                  "/icons/titlebar/floating_focus_active.png"
+theme.titlebar_maximized_button_normal_inactive = theme.confdir ..
+                                                      "/icons/titlebar/maximized_normal_inactive.png"
+theme.titlebar_maximized_button_focus_inactive = theme.confdir ..
+                                                     "/icons/titlebar/maximized_focus_inactive.png"
+theme.titlebar_maximized_button_normal_active = theme.confdir ..
+                                                    "/icons/titlebar/maximized_normal_active.png"
+theme.titlebar_maximized_button_focus_active = theme.confdir ..
+                                                   "/icons/titlebar/maximized_focus_active.png"
 
 local markup = lain.util.markup
 
 -- Textclock
 os.setlocale(os.getenv("LANG")) -- to localize the clock
 local clockicon = wibox.widget.imagebox(theme.widget_clock)
-local mytextclock = wibox.widget.textclock(markup("#7788af", "%A %d %B ") .. markup("#535f7a", ">") ..
-                                               markup("#de5e1e", " %I:%M "))
+local mytextclock = wibox.widget.textclock(
+                        markup("#7788af", "%A %d %B ") .. markup("#535f7a", ">") ..
+                            markup("#de5e1e", " %I:%M "))
 mytextclock.font = theme.font
 
 -- Systray
@@ -134,7 +155,8 @@ theme.weather = lain.widget.weather({
     settings = function()
         descr = weather_now["weather"][1]["description"]:lower()
         units = math.floor(weather_now["main"]["temp"])
-        widget:set_markup(markup.fontfg(theme.font, "#eca4c4", descr .. " @ " .. units .. "°C "))
+        widget:set_markup(markup.fontfg(theme.font, "#eca4c4",
+                                        descr .. " @ " .. units .. "°C "))
     end
 })
 
@@ -160,7 +182,8 @@ theme.mail = lain.widget.imap({
     settings = function()
         if mailcount > 0 then
             mailicon:set_image(theme.widget_mail)
-            widget:set_markup(markup.fontfg(theme.font, "#cccccc", mailcount .. " "))
+            widget:set_markup(markup.fontfg(theme.font, "#cccccc",
+                                            mailcount .. " "))
         else
             widget:set_text("")
             -- mailicon:set_image() -- not working in 4.0
@@ -176,7 +199,8 @@ theme.mail = lain.widget.imap({
 local cpuicon = wibox.widget.imagebox(theme.widget_cpu)
 local cpu = lain.widget.cpu({
     settings = function()
-        widget:set_markup(markup.fontfg(theme.font, "#e33a6e", cpu_now.usage .. "% "))
+        widget:set_markup(markup.fontfg(theme.font, "#e33a6e",
+                                        cpu_now.usage .. "% "))
     end
 })
 
@@ -184,7 +208,8 @@ local cpu = lain.widget.cpu({
 local tempicon = wibox.widget.imagebox(theme.widget_temp)
 local temp = lain.widget.temp({
     settings = function()
-        widget:set_markup(markup.fontfg(theme.font, "#f1af5f", coretemp_now .. "°C "))
+        widget:set_markup(markup.fontfg(theme.font, "#f1af5f",
+                                        coretemp_now .. "°C "))
     end
 })
 
@@ -192,13 +217,13 @@ local temp = lain.widget.temp({
 local baticon = wibox.widget.imagebox(theme.widget_batt)
 local bat = lain.widget.bat({
     settings = function()
-        local perc = bat_now.perc ~= "N/A" and bat_now.perc .. "%" or bat_now.perc
+        local perc = bat_now.perc ~= "N/A" and bat_now.perc .. "%" or
+                         bat_now.perc
 
-        if bat_now.ac_status == 1 then
-            perc = perc .. " plug"
-        end
+        if bat_now.ac_status == 1 then perc = perc .. " plug" end
 
-        widget:set_markup(markup.fontfg(theme.font, theme.fg_normal, perc .. " "))
+        widget:set_markup(
+            markup.fontfg(theme.font, theme.fg_normal, perc .. " "))
     end
 })
 
@@ -210,7 +235,8 @@ theme.volume = lain.widget.alsa({
             volume_now.level = volume_now.level .. "M"
         end
 
-        widget:set_markup(markup.fontfg(theme.font, "#7493d2", volume_now.level .. "% "))
+        widget:set_markup(markup.fontfg(theme.font, "#7493d2",
+                                        volume_now.level .. "% "))
     end
 })
 
@@ -220,13 +246,16 @@ local netdowninfo = wibox.widget.textbox()
 local netupicon = wibox.widget.imagebox(theme.widget_netup)
 local netupinfo = lain.widget.net({
     settings = function()
-        if iface ~= "network off" and string.match(theme.weather.widget.text, "N/A") then
+        if iface ~= "network off" and
+            string.match(theme.weather.widget.text, "N/A") then
             theme.weather.update()
         end
 
         -- widget:set_markup(markup.fontfg(theme.font, "#e54c62", net_now.devices .. " "))
-        widget:set_markup(markup.fontfg(theme.font, "#e54c62", net_now.sent .. " "))
-        netdowninfo:set_markup(markup.fontfg(theme.font, "#87af5f", net_now.received .. " "))
+        widget:set_markup(markup.fontfg(theme.font, "#e54c62",
+                                        net_now.sent .. " "))
+        netdowninfo:set_markup(markup.fontfg(theme.font, "#87af5f",
+                                             net_now.received .. " "))
     end
 })
 
@@ -234,23 +263,22 @@ function ip_line()
     local f = io.popen("ip addr show enp42s0 | grep 'inet ' | cut -d' ' -f6")
     local l = f:lines()
     local v = ''
-    for line in l do
-        return line
-    end
+    for line in l do return line end
 end
 
 -- MEM
 local memicon = wibox.widget.imagebox(theme.widget_mem)
 local memory = lain.widget.mem({
     settings = function()
-        widget:set_markup(markup.fontfg(theme.font, "#e0da37", mem_now.used .. "M "))
+        widget:set_markup(markup.fontfg(theme.font, "#e0da37",
+                                        mem_now.used .. "M "))
     end
 })
 
 -- MPD
 local musicplr = "alacritty --class Music -e ncmpcpp"
 local mpdicon = wibox.widget.imagebox(theme.widget_music)
-mpdicon:buttons(my_table.join(awful.button({modkey}, 1, function()
+mpdicon:buttons(my_table.join(awful.button({config.modkey}, 1, function()
     awful.spawn.with_shell(musicplr)
 end), awful.button({}, 1, function()
     awful.spawn.with_shell("mpc prev")
@@ -258,9 +286,9 @@ end), awful.button({}, 1, function()
 end), awful.button({}, 2, function()
     awful.spawn.with_shell("mpc toggle")
     theme.mpd.update()
-end), awful.button({modkey}, 3, function()
-    awful.spawn.with_shell("pkill ncmpcpp")
-end), awful.button({}, 3, function()
+end), awful.button({config.modkey}, 3,
+                   function() awful.spawn.with_shell("pkill ncmpcpp") end),
+                              awful.button({}, 3, function()
     awful.spawn.with_shell("mpc stop")
     theme.mpd.update()
 end)))
@@ -270,8 +298,9 @@ theme.mpd = lain.widget.mpd({
             artist = " " .. mpd_now.artist .. " "
             title = mpd_now.title .. " "
             mpdicon:set_image(theme.widget_music_on)
-            widget:set_markup(
-                markup.font(theme.font, markup("#FFFFFF", artist) .. " " .. title .. " " .. mpd_now.volume))
+            widget:set_markup(markup.font(theme.font,
+                                          markup("#FFFFFF", artist) .. " " ..
+                                              title .. " " .. mpd_now.volume))
         elseif mpd_now.state == "pause" then
             widget:set_markup(markup.font(theme.font, " Please wait warmly "))
             mpdicon:set_image(theme.widget_music_pause)
@@ -294,9 +323,7 @@ function theme.at_screen_connect(s)
 
     -- If wallpaper is a function, call it with the screen
     local wallpaper = theme.wallpaper
-    if type(wallpaper) == "function" then
-        wallpaper = wallpaper(s)
-    end
+    if type(wallpaper) == "function" then wallpaper = wallpaper(s) end
     gears.wallpaper.maximized(wallpaper, s, true)
 
     -- Tags
@@ -309,29 +336,23 @@ function theme.at_screen_connect(s)
     s.mylayoutbox = awful.widget.layoutbox(s)
     s.mylayoutbox:buttons(my_table.join(awful.button({}, 1, function()
         awful.layout.inc(1)
-    end), awful.button({}, 3, function()
-        awful.layout.inc(-1)
-    end), awful.button({}, 4, function()
+    end), awful.button({}, 3, function() awful.layout.inc(-1) end),
+                                        awful.button({}, 4, function()
         awful.layout.inc(1)
-    end), awful.button({}, 5, function()
-        awful.layout.inc(-1)
-    end)))
+    end), awful.button({}, 5, function() awful.layout.inc(-1) end)))
     -- Create a taglist widget
-    s.mytaglist = awful.widget.taglist(s, awful.widget.taglist.filter.all, awful.util.taglist_buttons)
+    s.mytaglist = awful.widget.taglist(s, awful.widget.taglist.filter.all,
+                                       awful.util.taglist_buttons)
 
-    if (s.index == 1) then
-        awful.tag.viewidx(1, s)
-    end
+    if (s.index == 1) then awful.tag.viewidx(1, s) end
 
-    if (s.index == 2) then
-        awful.tag.viewidx(2, s)
-    end
-    if (s.index == 3) then
-        awful.tag.viewidx(3, s)
-    end
+    if (s.index == 2) then awful.tag.viewidx(2, s) end
+    if (s.index == 3) then awful.tag.viewidx(3, s) end
 
     -- Create a tasklist widget
-    s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, awful.util.tasklist_buttons)
+    s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter
+                                             .currenttags,
+                                         awful.util.tasklist_buttons)
 
     -- Create the wibox
     s.mywibox = awful.wibar({
