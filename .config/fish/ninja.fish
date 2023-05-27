@@ -1,0 +1,18 @@
+# XDG
+set -Ux XDG_DATA_HOME "$HOME/.local/share"
+set -Ux XDG_CONFIG_HOME "$HOME/.config"
+set -Ux XDG_CACHE_HOME "$HOME/.local/.cache"
+set -Ux XDG_STATE_HOME "$HOME/.local/state"
+
+set -Ux ANDROID_HOME "$XDG_DATA_HOME/android"
+set -Ux ANSIBLE_HOME "$XDG_CONFIG_HOME/ansible"
+set -Ux AZURE_CONFIG_DIR "$XDG_DATA_HOME/azure"
+set -Ux CARGO_HOME "$XDG_DATA_HOME/cargo"
+set -Ux DOCKER_CONFIG "$XDG_CONFIG_HOME/docker"
+set -Ux GOPATH "$XDG_DATA_HOME/go"
+set -Ux GTK2_RC_FILES "$XDG_CONFIG_HOME/gtk-2.0/gtkrc"
+set -Ux XCURSOR_PATH "/usr/share/icons:$XDG_DATA_HOME/icons"
+set -Ux KDEHOME "$XDG_CONFIG_HOME/kde"
+set -Ux LESSHISTFILE "$XDG_STATE_HOME/less/history"
+set -Ux NODE_REPL_HISTORY "$XDG_DATA_HOME/node_reply_history"
+set -Ux NUGET_PACKAGES "$XDG_CACHE_HOME/NuGetPackages"
