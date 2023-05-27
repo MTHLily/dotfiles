@@ -1,0 +1,27 @@
+#!/usr/bin/env fish
+
+## Author : Aditya Shakya (adi1090x)
+## Github : @adi1090x
+#
+## Rofi   : Launcher (Modi Drun, Run, File Browser, Window)
+#
+## Available Styles
+#
+## style-1     style-2     style-3     style-4     style-5
+## style-6     style-7     style-8     style-9     style-10
+
+if not test -z $argv
+  switch $argv
+    case "Personal"
+      xdg-open "obsidian://open?vault=今日のマイク" &> /dev/null &
+    case "Headspace"
+      xdg-open "obsidian://open?vault=Headspace"  &> /dev/null &
+    case "TTRPG"
+      xdg-open "obsidian://open?vault=TTRPG" &> /dev/null &
+  end
+  exit 0
+end
+
+set choices "Dotfiles"
+
+echo -e (string join '\n' $choices)

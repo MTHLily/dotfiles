@@ -27,3 +27,4 @@ run flameshot
 run nextcloud
 run fcitx5 -d
 run klipper
+run solaar -w hide

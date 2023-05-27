@@ -1,0 +1,4 @@
+-- Mouse Keys:
+-- Mod + Left Click - Set as master
+-- Mod + Middle - Close
+-- Mod + Right Click - Properties
