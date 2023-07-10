@@ -51,9 +51,9 @@ awful.key({keys.alt}, "j", function() awful.client.focus.byidx(1) end,
     awful.key({keys.meta}, "d", function() awful.screen.focus_relative(-1) end,
         {description = "screen focus", group = "awesome/navigation"}))
 
-local client = tbl.join({},
-    awful.key({keys.meta}, "t", function(c) c.ontop = not c.ontop end,
-        {description = "pin to top", group = "awesome/client"}),
+local client = tbl.join({}, awful.key({keys.meta}, "t", function()
+    awful.client.ontop = not awful.client.ontop
+end, {description = "pin to top", group = "awesome/client"}),
     awful.key({keys.meta}, "n", function(c) c.minimized = true end,
         {description = "minimize client", group = "awesome/client"}),
     awful.key({keys.meta, keys.shift}, "n", function()

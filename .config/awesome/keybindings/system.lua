@@ -12,6 +12,9 @@ local system = tbl.join({},
 local mouse = tbl.join({},
     awful.key({keys.meta}, "Escape", function() awful.util.spawn("xkill") end,
         {description = "Kill process", group = "system"}),
+    awful.key({keys.meta}, "`", function()
+        awful.spawn.with_shell("$HOME/.config/local-bin/xprop-dialog")
+    end, {description = "Describe xprop", group = "system"}),
     awful.key({keys.meta, "Shift"}, "s",
         function() awful.util.spawn("flameshot gui") end,
         {description = "flameshot", group = "screenshots"}),

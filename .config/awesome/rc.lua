@@ -242,8 +242,9 @@ require("evil")
 -- Get screen geometry
 -- I am using a single screen setup and I assume that screen geometry will not
 -- change during the session.
-screen_width = awful.screen.focused().geometry.width
-screen_height = awful.screen.focused().geometry.height
+function screen_width() return awful.screen.focused().geometry.width end
+
+function screen_height() return awful.screen.focused().geometry.height end
 
 -- Layouts
 -- ===================================================================
@@ -420,6 +421,11 @@ awful.rules.rules = {
         },
         properties = {floating = true}
     }, -- TODO why does Chromium always start up floating in AwesomeWM?
+    {
+        rule_any = {class = {"megasync", "MEGAsync"}},
+        properties = {floating = true},
+        callback = function(c) decorations.hide(c) end
+    },
     -- Temporary fix until I figure it out
     {
         rule_any = {class = {"Chromium-browser", "Chromium"}},
@@ -460,7 +466,9 @@ awful.rules.rules = {
                 "discord",
                 "music",
                 "markdown_input",
-                "scratchpad"
+                "scratchpad",
+                "Pavucontrol",
+                "Thunar"
             },
             instance = {"music", "markdown_input", "scratchpad"},
             role = {"GtkFileChooserDialog", "conversation"}
@@ -524,7 +532,10 @@ awful.rules.rules = {
                 "URxvt"
             }
         },
-        properties = {width = screen_width * 0.45, height = screen_height * 0.5}
+        properties = {
+            width = screen_width() * 0.45,
+            height = screen_height() * 0.5
+        }
     }, -- Visualizer
     {
         rule = {class = "Spotify"},
@@ -540,7 +551,7 @@ awful.rules.rules = {
             skip_taskbar = true,
             below = true,
             focusable = false,
-            height = screen_height * 0.40,
+            height = screen_height() * 0.40,
             opacity = 0.6,
             titlebars_enabled = false
         },
@@ -548,37 +559,43 @@ awful.rules.rules = {
     }, -- File chooser dialog
     {
         rule_any = {role = {"GtkFileChooserDialog"}},
-        properties = {
-            floating = true,
-            width = screen_width * 0.55,
-            height = screen_height * 0.65
-        }
+        properties = {floating = true},
+        callback = function(c)
+            c:geometry{
+                width = screen_width() * 0.55,
+                height = screen_height() * 0.65
+            }
+        end
     }, -- Pavucontrol
     {
         rule_any = {class = {"Pavucontrol"}},
-        properties = {
-            floating = true,
-            width = screen_width * 0.45,
-            height = screen_height * 0.8
-        }
+        properties = {floating = true},
+        callback = function(c)
+            c:geometry{
+                width = screen_width() * 0.45,
+                height = screen_height() * 0.8
+            }
+        end
     }, -- Galculator
     {
         rule_any = {class = {"Galculator"}},
         except_any = {type = {"dialog"}},
         properties = {
             floating = true,
-            width = screen_width * 0.2,
-            height = screen_height * 0.4
+            width = screen_width() * 0.2,
+            height = screen_height() * 0.4
         }
     }, -- File managers
     {
         rule_any = {class = {"Nemo", "Thunar"}},
         except_any = {type = {"dialog"}},
-        properties = {
-            floating = true,
-            width = screen_width * 0.45,
-            height = screen_height * 0.55
-        }
+        properties = {floating = true},
+        callback = function(c)
+            c:geometry{
+                width = screen_width() * 0.45,
+                height = screen_height() * 0.55
+            }
+        end
     }, -- Screenruler
     {
         rule_any = {class = {"Screenruler"}},
@@ -603,8 +620,8 @@ awful.rules.rules = {
         },
         properties = {
             floating = true,
-            width = screen_width * 0.7,
-            height = screen_height * 0.75
+            width = screen_width() * 0.7,
+            height = screen_height() * 0.75
         }
     }, -- Scratchpad
     {
@@ -618,8 +635,8 @@ awful.rules.rules = {
             ontop = false,
             minimized = true,
             sticky = false,
-            width = screen_width * 0.7,
-            height = screen_height * 0.75
+            width = screen_width() * 0.7,
+            height = screen_height() * 0.75
         }
     }, -- Markdown input
     {
@@ -630,30 +647,30 @@ awful.rules.rules = {
             ontop = false,
             minimized = true,
             sticky = false,
-            width = screen_width * 0.5,
-            height = screen_height * 0.7
+            width = screen_width() * 0.5,
+            height = screen_height() * 0.7
         }
     }, -- Music clients (usually a terminal running ncmpcpp)
     {
         rule_any = {class = {"music"}, instance = {"music"}},
         properties = {
             floating = true,
-            width = screen_width * 0.45,
-            height = screen_height * 0.50
+            width = screen_width() * 0.45,
+            height = screen_height() * 0.50
         }
     }, -- Image viewers
     {
         rule_any = {class = {"feh", "Sxiv"}},
-        properties = {
-            floating = true,
-            width = screen_width * 0.7,
-            height = screen_height * 0.75
-        },
+        properties = {floating = true},
         callback = function(c)
             awful.placement.centered(c, {
                 honor_padding = true,
                 honor_workarea = true
             })
+            c:geometry{
+                width = screen_width() * 0.7,
+                height = screen_height() * 0.75
+            }
         end
     }, -- Dragon drag and drop utility
     {
@@ -662,7 +679,7 @@ awful.rules.rules = {
             floating = true,
             ontop = true,
             sticky = true,
-            width = screen_width * 0.3
+            width = screen_width() * 0.3
         },
         callback = function(c)
             awful.placement.bottom_right(c, {
@@ -679,8 +696,8 @@ awful.rules.rules = {
         rule = {instance = "Magit"},
         properties = {
             floating = true,
-            width = screen_width * 0.55,
-            height = screen_height * 0.6
+            width = screen_width() * 0.55,
+            height = screen_height() * 0.6
         }
     }, -- Steam guard
     {
@@ -701,8 +718,8 @@ awful.rules.rules = {
             if awful.layout.get(awful.screen.focused()) == awful.layout.suit.max then
                 c.floating = true
                 c.ontop = true
-                c.width = screen_width * 0.30
-                c.height = screen_height * 0.35
+                c.width = screen_width() * 0.30
+                c.height = screen_height() * 0.35
                 awful.placement.bottom_right(c, {
                     honor_padding = true,
                     honor_workarea = true,

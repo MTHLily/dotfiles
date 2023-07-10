@@ -7,7 +7,12 @@ if status is-interactive
   function fish_greeting
   	cutefetch -b (random 0 13)
   end
+
+  abbr -a yay paru
+
   nvm use default --silent
+
+  starship init fish | source
 end
 
 # Path Additions
@@ -55,4 +60,3 @@ set -Ux PNPM_HOME "/home/maespera/.local/share/pnpm"
 fish_add_path "$PNPM_HOME"
 
 direnv hook fish | source
-starship init fish | source

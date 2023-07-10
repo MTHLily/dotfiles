@@ -2,11 +2,13 @@ local awful = require("awful")
 local gears = require("gears")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
+local naughty = require("naughty")
 
 local helpers = require("helpers")
 local keys = require("keys")
 
 local dock_autohide_delay = 0.5 -- seconds
+local last_coords = {x = 0, y = 0}
 
 -- {{{ Widgets
 local update_taglist = function(item, tag, index)
@@ -88,6 +90,13 @@ local update_taglist = function(item, tag, index)
         item.bg = tag_colors_empty[index]
     end
 end
+
+screen.connect_signal("property::geometry", function()
+    for s in screen do
+        awful.placement.bottom_right(s.traybox,
+            {margins = beautiful.useless_gap * 2})
+    end
+end)
 
 awful.screen.connect_for_each_screen(function(s)
     -- Create a taglist for every screen
@@ -246,7 +255,7 @@ awful.screen.connect_for_each_screen(function(s)
         shape = helpers.rrect(beautiful.border_radius),
         widget = wibox.container.background
     }
-    awful.placement.bottom_right(s.traybox, {wibox.widget.textbox("asd")},
+    awful.placement.bottom_right(s.traybox,
         {margins = beautiful.useless_gap * 2})
     s.traybox:buttons(gears.table.join(awful.button({}, 2, function()
         s.traybox.visible = false
@@ -265,6 +274,19 @@ function wibars_toggle()
 end
 
 function tray_toggle()
-    local s = awful.screen.focused()
-    s.traybox.visible = not s.traybox.visible
+    for s in screen do
+        if s == awful.screen.focused() then
+            s.traybox.visible = not s.traybox.visible
+            wibox.widget.systray().screen = s
+            if s.traybox.visible then
+                last_coords = {x = mouse.coords().x, y = mouse.coords().y}
+                local coords = helpers.wibox_center_coords(s.traybox)
+                mouse.coords {x = coords.x, y = coords.y}
+            else
+                mouse.coords {x = last_coords.x, y = last_coords.y}
+            end
+        else
+            s.traybox.visible = false
+        end
+    end
 end
