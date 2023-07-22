@@ -3,6 +3,7 @@ local wibox = require("wibox")
 local gears = require("gears")
 local beautiful = require("beautiful")
 local naughty = require("naughty")
+local cairo = require("lgi").cairo
 
 local helpers = require("helpers")
 
@@ -19,20 +20,26 @@ local default_icon = ""
 -- (This will be removed when notification rules are released)
 -- Using icomoon font
 local app_config = {
-    ['battery'] = {icon = "", title = false},
-    ['charger'] = {icon = "", title = false},
-    ['volume'] = {icon = "", title = false},
-    ['brightness'] = {icon = "", title = false},
-    ['screenshot'] = {icon = "", title = false},
-    ['Telegram Desktop'] = {icon = "", title = true},
-    ['night_mode'] = {icon = "", title = false},
-    ['NetworkManager'] = {icon = "", title = true},
-    ['youtube'] = {icon = "", title = true},
-    ['mpd'] = {icon = "", title = true},
-    ['mpv'] = {icon = "", title = true},
-    ['keyboard'] = {icon = "", title = false},
-    ['email'] = {icon = "", title = true},
-    ['layout'] = {icon = "󰕮", title = "true"}
+    ['battery'] = {icon = "", title = false, message_align = "center"},
+    ['charger'] = {icon = "", title = false, message_align = "center"},
+    ['volume'] = {icon = "", title = false, message_align = "center"},
+    ['brightness'] = {icon = "", title = false, message_align = "center"},
+    ['screenshot'] = {icon = "", title = false, message_align = "center"},
+    ['Telegram Desktop'] = {
+        icon = "",
+        title = true,
+        message_align = "center"
+    },
+    ['night_mode'] = {icon = "", title = false, message_align = "center"},
+    ['NetworkManager'] = {icon = "", title = true, message_align = "center"},
+    ['youtube'] = {icon = "", title = true, message_align = "center"},
+    ['mpd'] = {icon = "", title = true, message_align = "center"},
+    ['mpv'] = {icon = "", title = true, message_align = "center"},
+    ['keyboard'] = {icon = "", title = false, message_align = "center"},
+    ['email'] = {icon = "", title = true, message_align = "center"},
+    ['Mailspring'] = {icon = "", title = true, message_align = "left"},
+    ['layout'] = {icon = "󰕮", title = true, message_align = "center"},
+    ['discord'] = {icon = "󰙯", title = true, message_align = "left"}
 }
 
 local urgency_color = {
@@ -49,6 +56,10 @@ naughty.connect_signal("request::display", function(n)
     -- a textbox instead of an image. However, you have to determine its
     -- text/markup value from the notification before creating the
     -- naughty.layout.box.
+
+    local custom_left_widget = nil
+    local custom_right_widget = nil
+    local custom_bg = nil
     local custom_notification_icon = wibox.widget {
         font = "icomoon 18",
         -- font = "icomoon bold 40",
@@ -57,15 +68,54 @@ naughty.connect_signal("request::display", function(n)
         widget = wibox.widget.textbox
     }
 
-    local icon, title_visible
+    local icon, title_visible, message_align
     local color = urgency_color[n.urgency]
     -- Set icon according to app_name
     if app_config[n.app_name] then
         icon = app_config[n.app_name].icon
         title_visible = app_config[n.app_name].title
+        message_align = app_config[n.app_name].message_align
     else
         icon = default_icon
         title_visible = true
+        message_align = "center"
+    end
+
+    if n.app_name == "discord" then
+        local bg_w, bg_h = gears.surface.get_size(n.image)
+        custom_left_widget = function(_)
+            return {
+                {
+                    {
+                        markup = helpers.colorize_text(icon, color),
+                        align = "left",
+                        valign = "bottom",
+                        widget = custom_notification_icon
+                    },
+                    bgimage = function(context, cr, width, height)
+                        local h_scale = height / bg_h
+                        local w_scale = width / bg_w
+                        if (bg_w > bg_h) then
+                            h_scale = height / width
+                        else
+                            w_scale = width / height
+                        end
+                        local scale_w = bg_w * w_scale
+                        local scale_h = bg_h * h_scale
+                        cr:scale(w_scale, h_scale)
+                        cr:translate((width - scale_w), 0)
+                        cr:translate(0, (height - scale_h))
+                        cr:set_source_surface(n.image)
+                        cr:paint_with_alpha(.9)
+                    end,
+                    -- opacity = 0.5,
+                    widget = wibox.container.background
+                },
+                forced_width = dpi(50),
+                bg = x.background,
+                widget = wibox.container.background
+            }
+        end
     end
 
     local actions = wibox.widget {
@@ -97,6 +147,54 @@ naughty.connect_signal("request::display", function(n)
         widget = naughty.list.actions
     }
 
+    local left_widget = {
+        {
+            markup = helpers.colorize_text(icon, color),
+            align = "center",
+            valign = "center",
+            widget = custom_notification_icon
+        },
+        forced_width = dpi(50),
+        bg = x.background,
+        widget = wibox.container.background
+    }
+
+    local right_widget = {
+        {
+            {
+                align = "center",
+                visible = title_visible,
+                font = beautiful.notification_font,
+                markup = "<b>" .. n.title .. "</b>",
+                widget = wibox.widget.textbox
+                -- widget = naughty.widget.title,
+            },
+            {
+                align = message_align,
+                -- wrap = "char",
+                widget = naughty.widget.message
+            },
+            {
+                helpers.vertical_pad(dpi(10)),
+                {
+                    actions,
+                    shape = helpers.rrect(dpi(4)),
+                    widget = wibox.container.background
+                },
+                visible = n.actions and #n.actions > 0,
+                layout = wibox.layout.fixed.vertical
+            },
+            layout = wibox.layout.align.vertical
+        },
+        margins = beautiful.notification_margin,
+        widget = wibox.container.margin
+    }
+
+    if custom_left_widget then left_widget = custom_left_widget(left_widget) end
+    if custom_right_widget then
+        right_widget = custom_right_widget(right_widget)
+    end
+
     naughty.layout.box {
         notification = n,
         type = "notification",
@@ -108,47 +206,8 @@ naughty.connect_signal("request::display", function(n)
         widget_template = {
             {
                 {
-                    {
-                        {
-                            markup = helpers.colorize_text(icon, color),
-                            align = "center",
-                            valign = "center",
-                            widget = custom_notification_icon
-                        },
-                        forced_width = dpi(50),
-                        bg = x.background,
-                        widget = wibox.container.background
-                    },
-                    {
-                        {
-                            {
-                                align = "center",
-                                visible = title_visible,
-                                font = beautiful.notification_font,
-                                markup = "<b>" .. n.title .. "</b>",
-                                widget = wibox.widget.textbox
-                                -- widget = naughty.widget.title,
-                            },
-                            {
-                                align = "center",
-                                -- wrap = "char",
-                                widget = naughty.widget.message
-                            },
-                            {
-                                helpers.vertical_pad(dpi(10)),
-                                {
-                                    actions,
-                                    shape = helpers.rrect(dpi(4)),
-                                    widget = wibox.container.background
-                                },
-                                visible = n.actions and #n.actions > 0,
-                                layout = wibox.layout.fixed.vertical
-                            },
-                            layout = wibox.layout.align.vertical
-                        },
-                        margins = beautiful.notification_margin,
-                        widget = wibox.container.margin
-                    },
+                    left_widget,
+                    right_widget,
                     layout = wibox.layout.fixed.horizontal
                 },
                 strategy = "max",
@@ -164,4 +223,5 @@ naughty.connect_signal("request::display", function(n)
     }
 end)
 
--- naughty.disconnect_signal("request::display", naughty.default_notification_handler)
+-- naughty.disconnect_signal("request::display",
+--     naughty.default_notification_handler)

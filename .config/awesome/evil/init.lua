@@ -10,7 +10,7 @@ require("evil.volume")
 require("evil.microphone")
 require("evil.mpd")
 require("evil.brightness")
--- require("evil.spotify")
+require("evil.spotify")
 
 -- Internet access required
 -- Note: These daemons use a temp file to store the retrieved values in order

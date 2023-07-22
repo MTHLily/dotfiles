@@ -1,6 +1,7 @@
 local beautiful = require("beautiful")
 local naughty = require("naughty")
 local menubar = require("menubar")
+local gears = require("gears")
 
 local notifications = {}
 
@@ -8,6 +9,13 @@ local notifications = {}
 -- Icon size
 -- naughty.config.defaults['icon_size'] = beautiful.notification_icon_size
 naughty.config.defaults['border_width'] = beautiful.notification_border_width
+
+naughty.config.notify_callback = function(args)
+    gears.debug.dump("lololol")
+    gears.debug.dump(args)
+    if args.freedesktop_hints then gears.debug.dump(args.freedesktop_hints) end
+    return args
+end
 
 -- Timeouts
 naughty.config.defaults.timeout = 5

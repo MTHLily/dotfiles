@@ -11,7 +11,7 @@
   },
   "workspace": {
     "ignoreDir": ["tmp", "dotfiles", "bling"],
-    "library": ["internal", "/usr/share/awesome/lib/", "./bling"]
+    "library": ["internal", "/usr/share/awesome/lib/", "./bling", "/usr/share/lua/5.4/lgi"]
   },
     "workspace.checkThirdParty": false
 }
