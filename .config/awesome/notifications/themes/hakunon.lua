@@ -31,6 +31,11 @@ local app_config = {
         message_align = "center"
     },
     ['night_mode'] = {icon = "", title = false, message_align = "center"},
+    ['NetworkManager Applet'] = {
+        icon = "",
+        title = true,
+        message_align = "center"
+    },
     ['NetworkManager'] = {icon = "", title = true, message_align = "center"},
     ['youtube'] = {icon = "", title = true, message_align = "center"},
     ['mpd'] = {icon = "", title = true, message_align = "center"},
@@ -39,7 +44,8 @@ local app_config = {
     ['email'] = {icon = "", title = true, message_align = "center"},
     ['Mailspring'] = {icon = "", title = true, message_align = "left"},
     ['layout'] = {icon = "󰕮", title = true, message_align = "center"},
-    ['discord'] = {icon = "󰙯", title = true, message_align = "left"}
+    ['discord'] = {icon = "󰙯", title = true, message_align = "left"},
+    ['spotify'] = {icon = "📽", title = true, message_align = "center"}
 }
 
 local urgency_color = {
@@ -81,7 +87,7 @@ naughty.connect_signal("request::display", function(n)
         message_align = "center"
     end
 
-    if n.app_name == "discord" then
+    if n.app_name == "discord" or n.app_name == "spotify" then
         local bg_w, bg_h = gears.surface.get_size(n.image)
         custom_left_widget = function(_)
             return {
