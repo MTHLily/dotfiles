@@ -33,9 +33,6 @@ alias sc="sudo systemctl"
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 alias rscp='rsync --info=progress2 -auvz'
 
-# tmux Aliases
-alias dotedit='dotedit.fish'
-
 # PHP/Laravel Aliases
 alias sail="[ -f sail ] && bash sail || bash vendor/bin/sail"
 alias sa="sail artisan"
@@ -60,3 +57,4 @@ set -Ux PNPM_HOME "/home/maespera/.local/share/pnpm"
 fish_add_path "$PNPM_HOME"
 
 direnv hook fish | source
+fish_add_path /home/maespera/.spicetify
