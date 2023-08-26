@@ -254,6 +254,13 @@ sidebar = wibox({
 })
 sidebar.bg = beautiful.sidebar_bg or beautiful.wibar_bg or "#111111"
 sidebar.fg = beautiful.sidebar_fg or beautiful.wibar_fg or "#FFFFFF"
+
+function resize_sidebar(s)
+    sidebar.height = s.geometry.height
+    sidebar.width = beautiful.sidebar_width or dpi(300)
+    sidebar.screen = s
+end
+
 sidebar.opacity = beautiful.sidebar_opacity or 1
 sidebar.height = screen.primary.geometry.height
 sidebar.width = beautiful.sidebar_width or dpi(300)
@@ -268,7 +275,10 @@ else
 end
 -- sidebar.shape = helpers.rrect(radius)
 
-sidebar_show = function() sidebar.visible = true end
+sidebar_show = function()
+    sidebar.visible = true
+    resize_sidebar(awful.screen.focused())
+end
 
 sidebar_hide = function() sidebar.visible = false end
 
@@ -284,28 +294,26 @@ if user.sidebar.hide_on_mouse_leave then
 end
 -- Activate sidebar by moving the mouse at the edge of the screen
 if user.sidebar.show_on_mouse_screen_edge then
-    local sidebar_activator = wibox({
-        y = sidebar.y,
-        width = 1,
-        visible = true,
-        ontop = false,
-        opacity = 0,
-        below = true,
-        screen = screen.primary
-    })
-    sidebar_activator.height = sidebar.height
-    sidebar_activator:connect_signal("mouse::enter",
-        function() sidebar.visible = true end)
+    awful.screen.connect_for_each_screen(function(s)
+        s.sidebar_activator = wibox({
+            y = s.geometry.height,
+            width = 1,
+            visible = true,
+            ontop = false,
+            opacity = 0,
+            below = true,
+            screen = s
+        })
+        s.sidebar_activator.height = sidebar.height
+        s.sidebar_activator:connect_signal("mouse::enter",
+            function() sidebar_show() end)
 
-    if beautiful.sidebar_position == "right" then
-        awful.placement.right(sidebar_activator)
-    else
-        awful.placement.left(sidebar_activator)
-    end
-
-    sidebar_activator:buttons(gears.table.join(
-        awful.button({}, 4, function() awful.tag.viewprev() end),
-        awful.button({}, 5, function() awful.tag.viewnext() end)))
+        if beautiful.sidebar_position == "right" then
+            awful.placement.right(s.sidebar_activator)
+        else
+            awful.placement.left(s.sidebar_activator)
+        end
+    end)
 end
 
 -- Item placement

@@ -9,7 +9,9 @@ local wibox = require("wibox")
 local icons = require("icons")
 local notifications = require("notifications")
 local naughty = require("naughty")
+local config = require("config")
 
+local do_debug = config.features.debug
 local helpers = {}
 
 -- Create rounded rectangle shape (in one line)
@@ -454,6 +456,13 @@ end
 
 function helpers.wibox_center_coords(w)
     return {x = w.x + w.width / 2, y = w.y + w.height / 2}
+end
+
+function helpers.log(data, title)
+    if do_debug then
+        if title ~= nil then gears.debug.dump(title) end
+        gears.debug.dump(data)
+    end
 end
 
 return helpers

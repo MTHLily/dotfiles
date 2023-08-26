@@ -3,6 +3,9 @@ local awful = require("awful")
 local naughty = require("naughty")
 local gears = require("gears")
 
+local helpers = require("helpers")
+local log = helpers.log
+
 -- Declare widgets
 local spotify_artist = wibox.widget.textbox()
 local spotify_title = wibox.widget.textbox()
@@ -24,6 +27,8 @@ awesome.connect_signal("evil::spotify", function(artist, title, status, cover)
     spotify_artist.text = artist
     spotify_title.text = title
 
+    local image = gears.surface.load(cover)
+
     -- Example notification (might not be needed if spotify already sends one)
     if status == "playing" then
         naughty.notification {
@@ -31,7 +36,7 @@ awesome.connect_signal("evil::spotify", function(artist, title, status, cover)
             title = "「音楽」 Now Playing",
             message = title .. " by " .. artist,
             app_name = "spotify",
-            image = gears.surface.load(cover)
+            image = image
         }
     end
 end)

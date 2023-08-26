@@ -13,16 +13,18 @@
     "lovelace", -- 2 --
     "skyfall", -- 3 --
     "ephemeral", -- 4 --
-    "amarena" -- 5 --
+    "amarena", -- 5 --
+    "hakunon"
 }
 -- Change this number to use a different theme
-local theme = themes[5]
+local theme = themes[6]
 -- ===================================================================
 -- Affects the window appearance: titlebar, titlebar buttons...
 local decoration_themes = {
     "lovelace", -- 1 -- Standard titlebar with 3 buttons (close, max, min)
     "skyfall", -- 2 -- No buttons, only title
-    "ephemeral" -- 3 -- Text-generated titlebar buttons
+    "ephemeral", -- 3 -- Text-generated titlebar buttons
+    "hakunon"
 }
 local decoration_theme = decoration_themes[1]
 -- ===================================================================
@@ -32,9 +34,10 @@ local bar_themes = {
     "lovelace", -- 2 -- Start button, taglist, layout
     "skyfall", -- 3 -- Weather, taglist, window buttons, pop-up tray
     "ephemeral", -- 4 -- Taglist, start button, tasklist, and more buttons
-    "amarena" -- 5 -- Minimal taglist and dock with autohide
+    "amarena", -- 5 -- Minimal taglist and dock with autohide
+    "hakunon"
 }
-local bar_theme = bar_themes[5]
+local bar_theme = bar_themes[6]
 
 -- ===================================================================
 -- Affects which icon theme will be used by widgets that display image icons.
@@ -42,7 +45,7 @@ local icon_themes = {
     "linebit", -- 1 -- Neon + outline
     "drops" -- 2 -- Pastel + filled
 }
-local icon_theme = icon_themes[1]
+local icon_theme = icon_themes[2]
 -- ===================================================================
 local notification_themes = {
     "lovelace", -- 1 -- Plain with standard image icons
@@ -63,7 +66,7 @@ local dashboard_themes = {
     "skyfall", -- 1 --
     "amarena" -- 2 -- Displays coronavirus stats
 }
-local dashboard_theme = dashboard_themes[1]
+local dashboard_theme = dashboard_themes[2]
 -- ===================================================================
 local exit_screen_themes = {
     "lovelace", -- 1 -- Uses image icons
@@ -181,9 +184,6 @@ local theme_dir = os.getenv("HOME") .. "/.config/awesome/themes/" .. theme ..
                       "/"
 beautiful.init(theme_dir .. "theme.lua")
 
-beautiful.titlebar_size = dpi(35)
-beautiful.titlebar_title_enabled = false
-
 -- Error handling
 -- ===================================================================
 naughty.connect_signal("request::display_error", function(message, startup)
@@ -232,6 +232,8 @@ require("elemental.window_switcher")
 -- Toggle-able microphone overlay
 require("elemental.microphone_overlay")
 
+require("elemental.desktop.hakunon")
+
 -- >> Daemons
 -- Most widgets that display system/external info depend on evil.
 -- Make sure to initialize it last in order to allow all widgets to connect to
@@ -271,35 +273,15 @@ awful.layout.layouts = {
 
 -- Wallpaper
 -- ===================================================================
-local function set_wallpaper(s)
-    -- Wallpaper
-    if beautiful.wallpaper then
-        -- local wallpaper = beautiful.wallpaper
-        -- -- If wallpaper is a function, call it with the screen
-        -- if type(wallpaper) == "function" then
-        --     wallpaper = wallpaper(s)
-        -- end
+awful.spawn.with_shell("nitrogen --restore")
 
-        -- >> Method 1: Built in wallpaper function
-        -- gears.wallpaper.fit(wallpaper, s, true)
-        -- gears.wallpaper.maximized(wallpaper, s, true)
-        awful.spawn.with_shell("nitrogen --restore")
-        -- >> Method 2: Set theme's wallpaper with feh
-        -- awful.spawn.with_shell("feh --bg-fill " .. wallpaper)
+local tallest_screen = awful.screen.focused()
 
-        -- >> Method 3: Set last wallpaper with feh
-        -- awful.spawn.with_shell(os.getenv("HOME") .. "/.fehbg")
+for s in screen do
+    if s.geometry.height > tallest_screen.geometry.height then
+        tallest_screen = s
     end
 end
-
--- Set wallpaper
-awful.screen.connect_for_each_screen(function(s)
-    -- Wallpaper
-    set_wallpaper(s)
-end)
-
--- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
-screen.connect_signal("property::geometry", set_wallpaper)
 
 -- Tags
 -- ===================================================================
@@ -325,15 +307,6 @@ awful.screen.connect_for_each_screen(function(s)
                          {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}
     -- Create all tags at once (without seperate configuration for each tag)
     awful.tag(tagnames, s, layouts)
-
-    -- Create tags with seperate configuration for each tag
-    -- awful.tag.add(tagnames[1], {
-    --     layout = layouts[1],
-    --     screen = s,
-    --     master_width_factor = 0.6,
-    --     selected = true,
-    -- })
-    -- ...
 end)
 
 -- Determines how floating clients should be placed
@@ -364,6 +337,8 @@ local centered_client_placement = function(c)
     end)
 end
 
+gears.debug.dump("TALLEST SCREEN:")
+gears.debug.dump(tallest_screen.geometry.height)
 -- Rules
 -- ===================================================================
 -- Rules to apply to new clients (through the "manage" signal).
@@ -797,8 +772,6 @@ awful.rules.rules = {
     {
         rule_any = {
             class = {
-                "Chromium",
-                "Chromium-browser",
                 "discord",
                 "TelegramDesktop",
                 "Signal",
@@ -809,7 +782,10 @@ awful.rules.rules = {
                 "6cord"
             }
         },
-        properties = {screen = 1, tag = awful.screen.focused().tags[5]}
+        properties = {
+            screen = tallest_screen,
+            tag = awful.screen.focused().tags[6]
+        }
     }, -- Editing
     {
         rule_any = {
@@ -830,15 +806,15 @@ awful.rules.rules = {
         properties = {screen = 1, tag = awful.screen.focused().tags[6]}
     }, -- Mail
     {
-        rule_any = {class = {"email"}, instance = {"email"}},
-        properties = {screen = 1, tag = awful.screen.focused().tags[7]}
+        rule_any = {class = {"email"}, instance = {"mailspring"}},
+        properties = {screen = 1, tag = awful.screen.focused().tags[8]}
     }, -- Game clients/launchers
     {
         rule_any = {
             class = {"Steam", "battle.net.exe", "Lutris"},
             name = {"Steam"}
         },
-        properties = {screen = 1, tag = awful.screen.focused().tags[8]}
+        properties = {screen = 1, tag = awful.screen.focused().tags[6]}
     }, -- Miscellaneous
     -- All clients that I want out of my way when they are running
     {
@@ -989,8 +965,7 @@ awful.spawn.easy_async_with_shell("stat " .. dashboard_flag_path ..
 -- collectgarbage("setpause", 160)
 -- collectgarbage("setstepmul", 400)
 awful.spawn.with_shell("~/.config/awesome/autostart.sh")
-awful.spawn.with_shell(
-    "picom -b --config  $HOME/.config/awesome/dotfiles/config/picom/picom.conf")
+awful.spawn.with_shell("picom -b --config  $HOME/.config/awesome/picom.conf")
 
 collectgarbage("setpause", 110)
 collectgarbage("setstepmul", 1000)

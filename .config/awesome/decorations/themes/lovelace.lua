@@ -12,13 +12,19 @@ decorations.enable_rounding()
 
 -- Add a titlebar
 client.connect_signal("request::titlebars", function(c)
-    awful.titlebar(c, {font = beautiful.titlebar_font, position = beautiful.titlebar_position, size = beautiful.titlebar_size}) : setup {
+    awful.titlebar(c, {
+        font = beautiful.titlebar_font,
+        position = beautiful.titlebar_position,
+        size = beautiful.titlebar_size
+    }):setup{
         nil,
         {
             buttons = keys.titlebar_buttons,
             font = beautiful.titlebar_font,
             align = beautiful.titlebar_title_align or "center",
-            widget = beautiful.titlebar_title_enabled and awful.titlebar.widget.titlewidget(c) or wibox.widget.textbox("")
+            widget = beautiful.titlebar_title_enabled and
+                awful.titlebar.widget.titlewidget(c) or
+                wibox.widget.textbox("asdad")
         },
         {
             awful.titlebar.widget.minimizebutton(c),

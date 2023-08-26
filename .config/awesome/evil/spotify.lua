@@ -5,6 +5,7 @@
 --      status (string) [playing | paused | stopped]
 local awful = require("awful")
 local gears = require("gears")
+local config = require("config")
 
 local function emit_info(playerctl_output)
     local player = playerctl_output:match('player_name(.*)artist_start')
@@ -16,9 +17,13 @@ local function emit_info(playerctl_output)
     local cover = playerctl_output:match('song_cover(.*)')
     if player == "firefox" then cover = cover:gsub("file://", "") end
 
-    awesome.emit_signal("evil::spotify", artist, title, status, cover)
-
-    return {cover = cover, player = player}
+    return {
+        cover = cover,
+        player = player,
+        artist = artist,
+        title = title,
+        status = status
+    }
 end
 
 -- Sleeps until spotify changes state (pause/play/next/prev)
@@ -34,16 +39,25 @@ awful.spawn.easy_async_with_shell(
         -- Emit song info with each line printed
         awful.spawn.with_line_callback(spotify_script, {
             stdout = function(line)
-                local cover = emit_info(line)
-                if line.player == "spotify" then
-                    awful.spawn.easy_async_with_shell(
-                        "wget -nc -P /home/maespera/.local/share/hakunon/covers " ..
-                            line.cover, function(wget_out)
+                local info = emit_info(line)
+                gears.debug.dump(line)
+                if info.player == "spotify" then
+                    local filename = info.cover:match("image/(.*)$")
+                    local path = config.locations.covers .. "/" .. filename
+                    awful.spawn.easy_async_with_shell("wget -nc -P " ..
+                                                          config.locations
+                                                              .covers .. " " ..
+                                                          info.cover,
+                        function(wget_out)
                             gears.debug
-                                .dump("Evil spotify: " .. cover .. wget_out)
+                                .dump("Evil spotify: " .. info.cover .. path)
+                            awesome.emit_signal("evil::spotify", info.artist,
+                                info.title, info.status, path)
                         end)
+                else
+                    awesome.emit_signal("evil::spotify", info.artist,
+                        info.title, info.status, info.cover)
                 end
             end
         })
     end)
-
