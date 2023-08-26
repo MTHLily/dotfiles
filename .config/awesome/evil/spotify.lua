@@ -14,7 +14,7 @@ local function emit_info(playerctl_output)
     -- Use the lower case of status
     local status = playerctl_output:match('status_start(.*)song_cover'):lower()
     status = string.gsub(status, '^%s*(.-)%s*$', '%1')
-    local cover = playerctl_output:match('song_cover(.*)')
+    local cover = playerctl_output:match('song_cover(.*)enddata')
     if player == "firefox" then cover = cover:gsub("file://", "") end
 
     return {
@@ -29,7 +29,7 @@ end
 -- Sleeps until spotify changes state (pause/play/next/prev)
 local spotify_script = [[
   sh -c '
-    playerctl metadata --format 'player_name{{playerName}}artist_start{{artist}}title_start{{title}}status_start{{status}}song_cover{{mpris:artUrl}}' --follow
+    playerctl metadata --format 'player_name{{playerName}}artist_start{{artist}}title_start{{title}}status_start{{status}}song_cover{{mpris:artUrl}}enddata' --follow
   ']]
 
 -- Kill old playerctl process

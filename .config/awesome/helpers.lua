@@ -465,4 +465,89 @@ function helpers.log(data, title)
     end
 end
 
+function helpers.create_background_image(args)
+    if args.image == nil then error("Image required") end
+
+    local valign_switch = {
+        center = function(cr, container_height, scaled_h)
+            cr:translate(0, (container_height - scaled_h) / 2)
+        end,
+        bottom = function(cr, container_height, scaled_h)
+            cr:translate(0, (container_height - scaled_h))
+        end,
+        number = function(cr, container_height, scaled_h, scaling_factor)
+            cr:translate(0, (container_height - scaled_h) * scaling_factor)
+        end
+    }
+
+    local halign_switch = {
+        center = function(cr, container_width, scaled_w)
+            cr:translate((container_width - scaled_w) / 2, 0)
+        end,
+        right = function(cr, container_width, scaled_w)
+            cr:translate((container_width - scaled_w), 0)
+        end,
+        number = function(cr, container_width, scaled_w, scaling_factor)
+            cr:translate((container_width - scaled_w) * scaling_factor, 0)
+        end
+    }
+
+    local image = args.image
+    local opacity = args.opacity or 1
+    local valign = valign_switch[args.valign] or
+                       valign_switch[type(args.valign)] or nil
+    local halign = halign_switch[args.halign] or
+                       halign_switch[type(args.halign)] or nil
+
+    local image_width, image_height = gears.surface.get_size(image)
+    return function(_, cr, container_width, container_height)
+        local ratio = 1
+        if (image_width > container_width and image_height > container_height) then
+            if (container_height > container_width) then
+                ratio = container_height / image_height
+            else
+                ratio = container_width / image_width
+            end
+        elseif container_width > image_width and container_height > image_height then
+            if (image_height > image_width) then
+                ratio = container_width / image_width
+            else
+                ratio = container_height / image_height
+            end
+        elseif image_width > container_width then
+            ratio = container_height / image_height
+        elseif image_height > container_height then
+            ratio = container_width / image_width
+        end
+
+        local scaled_width = image_width * ratio
+        local scaled_height = image_height * ratio
+
+        -- Check if new scaled values are not actually smaller or somethign
+        -- TODO Research if we can skip the recomparison
+        if scaled_height < container_height then
+            ratio = ratio * (container_height / scaled_height)
+            scaled_width = image_width * ratio
+            scaled_height = image_height * ratio
+        end
+
+        if scaled_width < container_width then
+            ratio = ratio * (container_width / scaled_width)
+            scaled_width = image_width * ratio
+            scaled_height = image_height * ratio
+        end
+
+        if halign ~= nil then
+            halign(cr, container_width, scaled_width, args.halign)
+        end
+        if valign ~= nil then
+            valign(cr, container_height, scaled_height, args.valign)
+        end
+        cr:scale(ratio, ratio)
+
+        cr:set_source_surface(image)
+        cr:paint_with_alpha(opacity)
+    end
+end
+
 return helpers

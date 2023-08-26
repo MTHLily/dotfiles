@@ -172,8 +172,8 @@ local mpd_song = require("noodle.mpd_song")
 local mpd_widget_children = mpd_song:get_all_children()
 local mpd_title = mpd_widget_children[1]
 local mpd_artist = mpd_widget_children[2]
-mpd_title.font = "sans medium 14"
-mpd_artist.font = "sans 11"
+mpd_title.font = "Iosevka Nerd Font Mono 14"
+mpd_artist.font = "Iosevka Nerd Font Mono 11"
 
 -- Set forced height in order to limit the widgets to one line.
 -- Might need to be adjusted depending on the font.

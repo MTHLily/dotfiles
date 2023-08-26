@@ -6,6 +6,7 @@ local naughty = require("naughty")
 local helpers = require("helpers")
 local apps = require("apps")
 local icons = require("icons")
+local config = require("config")
 
 local keygrabber = require("awful.keygrabber")
 
@@ -35,13 +36,6 @@ function create_boxed_widget(widget_to_be_boxed, bg_color)
             layout = wibox.layout.align.horizontal,
             expand = "none"
         },
-        -- border_color = "#00000020",
-        border_color = gears.color.create_radial_pattern({
-            from = {0, 0, 70},
-            to = {70, 70, 300},
-            stops = {{0, "#0000"}, {0.5, "#00000050"}, {1, "#00000090"}}
-        }),
-        border_width = dpi(5),
         widget = box_container
     }
 
@@ -71,6 +65,8 @@ local desktop = wibox({
 desktop.bg = "#00000000"
 awful.placement.centered(desktop)
 
+local hakunon_box = gears.surface.load(config.locations.hakunon_box)
+
 local calendar = wibox.widget.calendar.month(os.date("*t"))
 calendar.font = "sans medium 10"
 local calendar_widget = create_boxed_widget(calendar, x.foreground)
@@ -78,7 +74,13 @@ local search_widget = create_boxed_widget(wibox.widget {
     text = "Searchbox",
     widget = wibox.widget.textbox
 }, x.foreground)
-local bg_widget = {bg = x.color0, widget = wibox.widget.background}
+local hakunon_widget = wibox.widget {
+    bgimage = helpers.create_background_image {
+        image = hakunon_box,
+        halign = 0.7
+    },
+    widget = wibox.widget.background
+}
 local ram_widget = create_boxed_widget(wibox.widget {
     text = "ram_widget",
     widget = wibox.widget.textbox
@@ -87,13 +89,6 @@ local hdd_widget = create_boxed_widget(wibox.widget {
     text = "hdd_widget",
     widget = wibox.widget.textbox
 }, x.foreground)
-local hakunon_widget = wibox.widget {
-    image = os.getenv("HOME") .. "/.config/awesome/assets/hakutea.jpg",
-    -- resize = true,
-    vertical_fit_policy = "fit",
-    horizontal_fit_policy = "auto",
-    widget = wibox.widget.imagebox
-}
 local shortcuts_widget = create_boxed_widget(wibox.widget {
     text = "shortcuts_widget",
     widget = wibox.widget.textbox
@@ -102,6 +97,7 @@ local weather_widget = create_boxed_widget(wibox.widget {
     text = "weather_widget",
     widget = wibox.widget.textbox
 }, x.foreground)
+
 gridbox:add_widget_at(search_widget, 1, 1, 2, 11)
 gridbox:add_widget_at(calendar_widget, 3, 1, 4, 5)
 gridbox:add_widget_at(ram_widget, 13, 14, 6, 5)

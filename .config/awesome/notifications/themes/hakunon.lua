@@ -4,6 +4,7 @@ local gears = require("gears")
 local beautiful = require("beautiful")
 local naughty = require("naughty")
 local cairo = require("lgi").cairo
+local catppuccin = require("colors.catppuccin")
 
 local helpers = require("helpers")
 
@@ -48,13 +49,15 @@ local app_config = {
         icon = "󰙯",
         title = true,
         message_align = "left",
-        image_width = dpi(75)
+        image_width = dpi(75),
+        icon_color = catppuccin.blue
     },
     ['spotify'] = {
-        icon = "📽",
+        icon = "",
         title = true,
         message_align = "center",
-        image_width = dpi(75)
+        image_width = dpi(75),
+        icon_color = catppuccin.green
     }
 }
 
@@ -86,17 +89,10 @@ naughty.connect_signal("request::display", function(n)
     local icon, title_visible, message_align, image_width
     local color = urgency_color[n.urgency]
     -- Set icon according to app_name
-    if app_config[n.app_name] then
-        icon = app_config[n.app_name].icon
-        title_visible = app_config[n.app_name].title
-        message_align = app_config[n.app_name].message_align
-        image_width = app_config[n.app_name].image_width
-    else
-        icon = default_icon
-        title_visible = true
-        message_align = "center"
-        image_width = dpi(50)
-    end
+    icon = app_config[n.app_name].icon or default_icon
+    title_visible = app_config[n.app_name].title or false
+    message_align = app_config[n.app_name].message_align or "center"
+    image_width = app_config[n.app_name].image_width or dpi(50)
 
     if n.app_name == "discord" or n.app_name == "spotify" then
         local bg_w, bg_h = gears.surface.get_size(n.image)
@@ -106,64 +102,17 @@ naughty.connect_signal("request::display", function(n)
                 {
                     {
                         markup = helpers.colorize_text(icon, color),
-                        align = "left",
-                        valign = "bottom",
+                        align = "center",
+                        valign = "center",
                         widget = custom_notification_icon
                     },
-                    bgimage = function(context, cr, width, height)
-                        local ratio = 1
-                        if (bg_w > width and bg_h > height) then
-                            if (height > width) then
-                                ratio = height / bg_h
-                            else
-                                ratio = width / bg_w
-                            end
-                        elseif width > bg_w and height > bg_h then
-                            if (bg_h > bg_w) then
-                                ratio = width / bg_w
-                            else
-                                ratio = height / bg_h
-                            end
-                        elseif bg_w > width then
-                            ratio = height / bg_h
-                        elseif bg_h > height then
-                            ratio = width / bg_w
-                        end
-
-                        local scaled_w = bg_w * ratio
-                        local scaled_h = bg_h * ratio
-
-                        cr:scale(ratio, ratio)
-                        cr:translate((width - scaled_w) / 2, 0)
-                        cr:translate(0, (height - scaled_h) / 2)
-                        cr:set_source_surface(n.image)
-                        cr:paint_with_alpha(0.9)
-
-                        -- local h_ratio = height / bg_h
-                        -- local w_ratio = width / bg_w
-                        -- if (bg_w > bg_h) then
-                        --     helpers.log("WIDTH IS Higher")
-                        --     h_ratio = height / width
-                        -- else
-                        --     helpers.log("Height IS Higher")
-                        --     w_ratio = width / height
-                        -- end
-                        -- local scale_w = bg_w * w_ratio
-                        -- local scale_h = bg_h * h_ratio
-                        -- cr:scale(w_ratio, h_ratio)
-                        -- cr:translate((width - scale_w), 0)
-                        -- cr:translate(0, (height - scale_h))
-                        -- cr:set_source_surface(n.image)
-                        -- cr:paint_with_alpha(0.9)
-                        -- helpers.log({
-                        --     n_w = width,
-                        --     n_h = height,
-                        --     i_w = bg_w,
-                        --     i_h = bg_h,
-                        --     w_ratio = w_ratio,
-                        --     h_ratio = h_ratio
-                        -- }, "Image Ratios")
-                    end,
+                    bgimage = n.image == nil and nil or
+                        helpers.create_background_image {
+                            image = n.image,
+                            valign = "center",
+                            halign = "center",
+                            opacity = 0.6
+                        },
                     -- opacity = 0.5,
                     widget = wibox.container.background
                 },
