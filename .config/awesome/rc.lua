@@ -254,8 +254,8 @@ function screen_height() return awful.screen.focused().geometry.height end
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
     awful.layout.suit.tile,
-    awful.layout.suit.floating,
-    awful.layout.suit.max,
+    -- awful.layout.suit.floating,
+    -- awful.layout.suit.max,
     -- awful.layout.suit.spiral,
     -- awful.layout.suit.spiral.dwindle,
     awful.layout.suit.tile.top
@@ -286,25 +286,41 @@ end
 -- Tags
 -- ===================================================================
 awful.screen.connect_for_each_screen(function(s)
-    -- Each screen has its own tag table.
-    local l = awful.layout.suit -- Alias to save time :)
-    -- Tag layouts
-    local layouts = {
-        l.tile,
-        l.tile,
-        l.tile,
-        l.tile,
-        l.tile,
-        l.tile,
-        l.tile,
-        l.tile,
-        l.tile,
-        l.tile
-    }
-
     -- Tag names
     local tagnames = beautiful.tagnames or
                          {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}
+    local layouts
+
+    -- Each screen has its own tag table.
+    local l = awful.layout.suit -- Alias to save time :)
+    if s.geometry.height > s.geometry.width then
+        layouts = {
+            l.tile.top,
+            l.tile.top,
+            l.tile.top,
+            l.tile.top,
+            l.tile.top,
+            l.tile.top,
+            l.tile.top,
+            l.tile.top,
+            l.tile.top,
+            l.tile.top
+        }
+    else
+        layouts = {
+            l.tile,
+            l.tile,
+            l.tile,
+            l.tile,
+            l.tile,
+            l.tile,
+            l.tile,
+            l.tile,
+            l.tile,
+            l.tile
+        }
+    end
+    -- Tag layouts
     -- Create all tags at once (without seperate configuration for each tag)
     awful.tag(tagnames, s, layouts)
 end)

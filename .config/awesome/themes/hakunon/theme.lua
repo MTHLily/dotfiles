@@ -14,9 +14,8 @@ local titlebar_icon_path = os.getenv("HOME") .. "/.config/awesome/themes/" ..
 local taglist_icon_path = os.getenv("HOME") .. "/.config/awesome/themes/" ..
                               theme_name .. "/taglist/"
 local tip = titlebar_icon_path -- alias to save time/space
-local xrdb = xresources.get_current_theme()
--- local theme = dofile(themes_path.."default/theme.lua")
 local theme = {}
+local catppuccin = require("colors.catppuccin")
 
 -- Set theme wallpaper.
 -- It won't change anything if you are using feh to set the wallpaper like I do.
@@ -27,9 +26,6 @@ theme.wallpaper =
 -- Set the theme font. This is the font that will be used by default in menus, bars, titlebars etc.
 -- theme.font          = "sans 11"
 theme.font = "monospace 11"
-
--- This is how to get other .Xresources values (beyond colors 0-15, or custom variables)
--- local cool_color = awesome.xrdb_get_value("", "color16")
 
 theme.bg_dark = x.background
 theme.bg_normal = x.color0
@@ -471,6 +467,13 @@ theme.awesome_icon = theme_assets.awesome_icon(theme.menu_height,
 -- Define the icon theme for application icons. If not set then the icons
 -- from /usr/share/icons and /usr/share/icons/hicolor will be used.
 theme.icon_theme = "/usr/share/icons/Numix"
+
+-- Help Popup
+theme.hotkeys_bg = catppuccin.base
+theme.hotkeys_fg = catppuccin.text
+theme.hotkeys_modifiers_fg = catppuccin.surface2
+theme.hotkeys_font = "Iosevka Nerd Font Mono 10"
+theme.hotkeys_description_font = "Iosevka Nerd Font Mono 10"
 
 return theme
 
