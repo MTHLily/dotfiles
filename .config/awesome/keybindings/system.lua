@@ -57,4 +57,5 @@ end, {description = "+10%", group = "system/screen"}),
         awful.spawn.with_shell("$HOME/.config/rofi/scripts/screenselector.sh")
     end, {description = "Screen Layout", group = "system/screen"}))
 
-return tbl.join(system, mouse, sound, input, screen)
+return {global = tbl.join(system, mouse, sound, input, screen)}
+

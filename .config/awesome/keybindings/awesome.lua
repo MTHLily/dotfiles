@@ -2,6 +2,7 @@ local awful = require("awful")
 local tbl = require("gears.table")
 local keys = require("keybindings.modkeys")
 local lain = require("lain")
+local helpers = require("helpers")
 
 local hotkeys_popup = require("awful.hotkeys_popup").widget
 local cycle_layout = require("noodle.cycle_layout")
@@ -137,10 +138,53 @@ local tags = tbl.join({},
         {description = "view previous", group = "awesome/tags"}),
     awful.key({keys.meta, keys.alt}, "Right", awful.tag.viewnext,
         {description = "view next", group = "awesome/tags"}),
+    awful.key({keys.meta, keys.alt}, "h", awful.tag.viewprev,
+        {description = "view previous", group = "awesome/tags"}),
+    awful.key({keys.meta, keys.alt}, "l", awful.tag.viewnext,
+        {description = "view next", group = "awesome/tags"}),
     awful.key({keys.meta}, "Tab", function() lain.util.tag_view_nonempty(1) end,
         {description = "view next", group = "awesome/tags"}),
     awful.key({keys.meta, "Shift"}, "Tab",
         function() lain.util.tag_view_nonempty(-1) end,
         {description = "view previous", group = "awesome/tags"}))
 
-return tbl.join(navigation, layout, client, tags, spacing, ui)
+for i = 1, 10 do
+    tags = tbl.join(tags, awful.key({Superkey}, "#" .. i + 9, function()
+        helpers.tag_back_and_forth(i)
+    end, {description = "view tag #", group = "awesome/tags"}),
+        awful.key({Superkey, Ctrlkey}, "#" .. i + 9, function()
+            local screen = awful.screen.focused()
+            local tag = screen.tags[i]
+            if tag then awful.tag.viewtoggle(tag) end
+        end, {description = "toggle tag #", group = "awesome/tags"}),
+        awful.key({Superkey, Shiftkey}, "#" .. i + 9, function()
+            if client.focus then
+                local tag = client.focus.screen.tags[i]
+                if tag then client.focus:move_to_tag(tag) end
+            end
+        end, {
+            description = "move focused client to tag #",
+            group = "awesome/tags"
+        }), awful.key({Superkey, Altkey}, "#" .. i + 9, function()
+            local tag = client.focus.screen.tags[i]
+            local clients = awful.screen.focused().clients
+            if tag then
+                for _, c in pairs(clients) do c:move_to_tag(tag) end
+                tag:view_only()
+            end
+        end, {
+            description = "move all visible clients to tag #",
+            group = "awesome/tags"
+        }), awful.key({Superkey, Ctrlkey, Shiftkey}, "#" .. i + 9, function()
+            if client.focus then
+                local tag = client.focus.screen.tags[i]
+                if tag then client.focus:toggle_tag(tag) end
+            end
+        end, {
+            description = "toggle focused client on tag #",
+            group = "awesome/tags"
+        }))
+end
+
+return {global = tbl.join(navigation, layout, client, tags, spacing, ui)}
+

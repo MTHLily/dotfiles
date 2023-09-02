@@ -1,5 +1,5 @@
 local config = {
-    features = {debug = true},
+    features = {debug = true, log_enable = {init = true}},
     keys = {},
     apps = {},
     locations = {

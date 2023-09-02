@@ -43,12 +43,14 @@ awesome.connect_signal("evil::spotify", function(artist, title, status, cover)
     spotify_title.text = title
 
     local image = cover ~= "" and gears.surface.load(cover) or nil
-    spotify_bg.bgimage = helpers.create_background_image {
-        image = image,
-        opacity = 0.2,
-        valign = "center",
-        halign = "center"
-    }
+    if image ~= nil then
+        spotify_bg.bgimage = helpers.create_background_image {
+            image = image,
+            opacity = 0.3,
+            valign = "center",
+            halign = "center"
+        }
+    end
 
     -- Example notification (might not be needed if spotify already sends one)
     if status == "playing" then

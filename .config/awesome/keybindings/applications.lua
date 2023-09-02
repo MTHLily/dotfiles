@@ -59,4 +59,5 @@ local applications = tbl.join({},
     awful.key({keys.meta}, "Return", function() awful.spawn(terminal) end,
         {description = terminal, group = "applications"}))
 
-return tbl.join(applications, launchers, scratchkeys)
+return {global = tbl.join(applications, launchers, scratchkeys)}
+

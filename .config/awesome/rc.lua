@@ -191,8 +191,10 @@ naughty.connect_signal("request::display_error", function(message, startup)
         urgency = "critical",
         title = "Oops, an error happened" ..
             (startup and " during startup!" or "!"),
-        message = message
+        message = message,
+        app_name = "error"
     }
+    gears.debug.dump({message = message, startup = startup, "Error message"})
 end)
 
 -- Features
