@@ -1,0 +1,4 @@
+nvim/.git
+nvim/.github
+nvim/lua/core
+nvim/lua/plugins
