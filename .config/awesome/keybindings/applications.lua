@@ -1,7 +1,7 @@
 local bling = require("bling")
 local tbl = require("gears.table")
 local awful = require("awful")
-local keys = require("keybindings.modkeys")
+local modkeys = require("keybindings.modkeys")
 
 local scratch = {}
 local browser = "firefox"
@@ -31,32 +31,32 @@ scratch.goldendict = bling.module.scratchpad {
     dont_focus_before_close = false
 }
 
-local launchers = tbl.join({}, awful.key({keys.meta}, "o", function()
+local launchers = tbl.join({}, awful.key({modkeys.meta}, "o", function()
     awful.spawn.with_shell("$HOME/.config/rofi/scripts/launcher.sh")
 end, {description = "launcher", group = "applications/launcher"}),
-    awful.key({keys.meta}, "e", function()
+    awful.key({modkeys.meta}, "e", function()
         awful.spawn.with_shell("$HOME/.config/rofi/scripts/app-launcher.sh")
     end, {description = "shortcuts", group = "applications/launcher"}))
 
 local scratchkeys = tbl.join({},
-    awful.key({keys.meta}, "[", function() scratch.calculator:toggle() end,
+    awful.key({modkeys.meta}, "[", function() scratch.calculator:toggle() end,
         {description = "Calculator", group = "applications/scratch"}),
-    awful.key({keys.meta}, "]", function() scratch.goldendict:toggle() end,
+    awful.key({modkeys.meta}, "]", function() scratch.goldendict:toggle() end,
         {description = "Dictionary", group = "applications/scratch"}))
 
 local applications = tbl.join({},
-    awful.key({keys.meta}, "w", function() awful.util.spawn(browser) end,
+    awful.key({modkeys.meta}, "w", function() awful.util.spawn(browser) end,
         {description = "Firefox", group = "applications"}),
-    awful.key({keys.meta, keys.shift}, "Return",
+    awful.key({modkeys.meta, modkeys.shift}, "Return",
         function() awful.util.spawn(filemanager) end,
         {description = "File Manager", group = "applications"}),
-    awful.key({keys.ctrl, keys.alt}, "c",
+    awful.key({modkeys.ctrl, modkeys.alt}, "c",
         function() awful.util.spawn("catfish") end,
         {description = "Catfish", group = "applications"}),
-    awful.key({keys.ctrl, keys.alt}, "s",
+    awful.key({modkeys.ctrl, modkeys.alt}, "s",
         function() awful.util.spawn(mediaplayer) end,
         {description = "Spotify", group = "applications"}),
-    awful.key({keys.meta}, "Return", function() awful.spawn(terminal) end,
+    awful.key({modkeys.meta}, "Return", function() awful.spawn(terminal) end,
         {description = terminal, group = "applications"}))
 
 return {global = tbl.join(applications, launchers, scratchkeys)}

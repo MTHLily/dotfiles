@@ -1,5 +1,7 @@
 -- Functions that you use more than once and in different files would
 -- be nice to define here.
+--
+-- TODO: Refactor to own folder
 local awful = require("awful")
 local gears = require("gears")
 local beautiful = require("beautiful")
@@ -457,7 +459,7 @@ function helpers.wibox_center_coords(w)
     return {x = w.x + w.width / 2, y = w.y + w.height / 2}
 end
 
-helpers.log_types = {"init"}
+helpers.log_types = {"init", "init_keys"}
 
 function helpers.log(data, title, log_type)
     if config.features.debug then
@@ -549,6 +551,21 @@ function helpers.create_background_image(args)
         cr:set_source_surface(image)
         cr:paint_with_alpha(opacity)
     end
+end
+
+function helpers.button_with_help(modifier, button, onpress, meta)
+    if meta then
+        local hotkeys_popup = require("awful.hotkeys_popup").widget
+        hotkeys_popup.add_hotkeys({
+            [meta.group] = {
+                {
+                    modifiers = modifier,
+                    keys = {["Mouse" .. button] = meta.description}
+                }
+            }
+        })
+    end
+    return awful.button(modifier, button, onpress)
 end
 
 return helpers
