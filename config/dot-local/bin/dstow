@@ -1,0 +1,50 @@
+#!/usr/bin/bash
+
+die() {
+  echo "$1"
+  exit "${2:-1}"
+}
+
+STOW_META_FILE=".stow-meta"
+STOW_GLOBAL_IGNORE_PATH="$HOME/.stow-global-ignore"
+
+# Initialize stow-meta
+if [ -f "$STOW_GLOBAL_IGNORE_PATH" ]; then
+  echo "Stow exists"
+  ignore_contents=$(awk -v x="$STOW_META_FILE" \
+    '$0 == x {found=1} END {if(!found) print x} 1' \
+    "$STOW_GLOBAL_IGNORE_PATH") 
+  echo "$ignore_contents" > "$STOW_GLOBAL_IGNORE_PATH"
+else
+  echo "Stow does not exist"
+  echo "$STOW_META_FILE" > "$STOW_GLOBAL_IGNORE_PATH"
+fi
+
+if [ -z "$1" ]; then
+  die "You did not specify a stow package." 2
+fi
+
+PACKAGE_NAME="$1"
+PACKAGE_PATH="./$PACKAGE_NAME"
+
+if [ -f "$PACKAGE_PATH/$STOW_META_FILE" ]; then
+  PACKAGE_CONFIG="$(yq '.' "$PACKAGE_PATH/$STOW_META_FILE")"
+  PACKAGE_LABEL="$(echo "$PACKAGE_CONFIG" | jq '.meta.name')"
+  eval PACKAGE_TARGET="$(echo "$PACKAGE_CONFIG" | jq '.meta.target')"
+  STOW_ADOPT="$(echo "$PACKAGE_CONFIG" | jq '.meta.adopt')"
+else
+  PACKAGE_LABEL="$PACKAGE_NAME"
+  PACKAGE_TARGET="$HOME/.config"
+  STOW_ADOPT="false"
+fi
+
+echo "$PACKAGE_LABEL"
+echo "$PACKAGE_TARGET"
+echo "$STOW_ADOPT"
+
+STOW_ARGS=()
+if [[ $STOW_ADOPT = "true" ]]; then
+  STOW_ARGS+=("--adopt")
+fi
+
+stow --target "$PACKAGE_TARGET" "${ARG_ADOPT[@]}" "$PACKAGE_NAME"

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+mkdir -p /tmp/ocr-capture
+
+flameshot gui -s --path /tmp/ocr-capture/capture.png

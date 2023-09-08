@@ -1,0 +1,4 @@
+meta:
+  name: xorg-configuration
+  target: "$HOME"
+  adopt: true

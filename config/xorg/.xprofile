@@ -1,0 +1,2 @@
+xrdb -merge "$HOME/.config/xresources"
+setxkbmap -option caps:ctrl_modifier 

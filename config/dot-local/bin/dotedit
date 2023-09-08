@@ -1,0 +1,20 @@
+#!/usr/bin/fish
+
+if test ! -z "$TMUX"
+  echo "You are currently in a tmux session"
+  exit 1
+end
+
+tmux attach -t dotfiles; set rc $status;
+
+if test $rc -eq 0
+  echo "$status"
+  exit 0
+end
+
+tmux new -s dotfiles -n "XDG Home" -d
+tmux send-keys -t dotfiles "cd ~/.config" Enter
+tmux new-window -n moon-cell-automata -t dotfiles
+tmux send-keys -t dotfiles "cd ~/Share/moon-cell-automata" Enter
+tmux select-window -t "XDG Home"
+tmux a -t dotfiles
