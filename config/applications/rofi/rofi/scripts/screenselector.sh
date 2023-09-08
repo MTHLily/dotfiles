@@ -12,9 +12,11 @@
 
 dir="$HOME/.config/rofi/launchers/type-7"
 theme='style-1'
+layouts="$HOME/.config/screenlayout"
 
 ## Run
-screen=$(exa ~/.screenlayout | rofi \
+screen=$(exa "$layouts" -I common | rofi \
     -dmenu \
-    -theme ${dir}/${theme}.rasi)
-/usr/bin/env bash "$HOME/.screenlayout/$screen"
+    -theme "${dir}/${theme}.rasi")
+
+/usr/bin/env bash "$layouts/$screen"

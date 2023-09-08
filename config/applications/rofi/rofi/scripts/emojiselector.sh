@@ -11,15 +11,13 @@
 ## style-6     style-7     style-8     style-9     style-10
 ## style-11    style-12    style-13    style-14    style-15
 
-dir="$HOME/.config/rofi/launchers/type-1"
-theme='style-5'
+dir="$HOME/.config/rofi/launchers/type-4"
+theme='style-2'
 
 ## Run
 # roficommand="rofi -show drun -theme ${dir}/${theme}.rasi" splatmoji type
 # dir="$HOME/.config/rofi/launchers/type-6"
 # theme='hakunon'
 
-nfscript=~/.config/rofi/scripts/apps/nerd-font-selector.sh
-
-rofi -show emoji -modes "nf:$nfscript,emoji" -theme ${dir}/${theme}.rasi
+rofi -modi emoji -show emoji -theme "$dir/$theme.rasi" -emoji-file "$HOME/.config/rofi/scripts/json/emoji_db"
 exit 0
