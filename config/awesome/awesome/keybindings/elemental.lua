@@ -1,6 +1,7 @@
 local tbl = require("gears.table")
 local awful = require("awful")
 local helpers = require("helpers")
+local modkeys = require("keybindings.modkeys")
 
 local tasklist = tbl.join(awful.button({'Any'}, 1, function(c)
     if c == client.focus then
@@ -26,29 +27,26 @@ end, {group = "elemental", description = "tasklist"}), -- Middle mouse button cl
 local taglist = tbl.join(awful.button({}, 1, function(t)
     -- t:view_only()
     helpers.tag_back_and_forth(t.index)
-end), awful.button({Superkey}, 1, function(t)
+end), awful.button({modkeys.meta}, 1, function(t)
     if client.focus then client.focus:move_to_tag(t) end
 end), -- awful.button({ }, 3, awful.tag.viewtoggle),
 awful.button({}, 3, function(t)
     if client.focus then client.focus:move_to_tag(t) end
-end), awful.button({Superkey}, 3, function(t)
+end), awful.button({modkeys.meta}, 3, function(t)
     if client.focus then client.focus:toggle_tag(t) end
 end), awful.button({}, 4, function(t) awful.tag.viewprev(t.screen) end),
     awful.button({}, 5, function(t) awful.tag.viewnext(t.screen) end))
 
 local hotkeys_popup = require("awful.hotkeys_popup").widget
--- hotkeys_popup.add_hotkeys({
---     ["TEST"] = {{modifiers = {}, keys = {["A"] = "DES"}}}
--- })
 local titlebar = tbl.join(helpers.button_with_help({}, 1, function()
     local c = mouse.object_under_pointer()
     client.focus = c
     awful.mouse.client.move(c)
 end, {description = "Move client", group = "elemental/titlebar"}), -- Middle button - close
-    awful.button({}, 2, function()
+    helpers.button_with_help({}, 2, function()
         local c = mouse.object_under_pointer()
         c:kill()
-    end), -- Right button - resize
+    end, {description = "Kill client", group = "elemental/titlebar"}), -- Right button - resize
     awful.button({}, 3, function()
         local c = mouse.object_under_pointer()
         client.focus = c
