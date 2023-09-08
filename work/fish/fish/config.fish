@@ -19,11 +19,12 @@ if status is-interactive
   source $HOME/.config/fish/abbreviations/git_abbr.fish
 
 end
+source $HOME/.config/fish/secrets.fish
 
 set -Ux EDITOR nvim
 set -Ux JIRA_API_TOKEN "NzQyMDE5NjM3ODQ1OgaE22eb2y527LvOo/+rCobd6TrP"
 set -Ux JIRA_AUTH_TYPE bearer
 
-
 fish_add_path $HOME/.config/fish/scripts
 fish_add_path $HOME/.config/npm/bin
+fish_add_path $HOME/.cargo/bin
