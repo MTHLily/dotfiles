@@ -227,15 +227,20 @@ function wibars_toggle()
     s.wibar.visible = not s.wibar.visible
 end
 
-function tray_toggle()
+function tray_resize()
     local systray_cols = math.ceil(awesome.systray() / 2.0)
     for s in screen do
         s.traybox.width = (beautiful.systray_icon_size * systray_cols) +
                               (beautiful.systray_icon_spacing * systray_cols)
         awful.placement.bottom_right(s.traybox,
             {margins = beautiful.useless_gap * 2})
+    end
+end
+
+function tray_toggle()
+    tray_resize()
+    for s in screen do
         if s == awful.screen.focused() then
-            gears.debug.dump(awesome.systray())
             s.traybox.visible = not s.traybox.visible
             wibox.widget.systray().screen = s
             if s.traybox.visible then
@@ -250,3 +255,5 @@ function tray_toggle()
         end
     end
 end
+
+awesome.connect_signal("systray::update", function() tray_resize() end)
