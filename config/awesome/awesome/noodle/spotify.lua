@@ -9,7 +9,7 @@ local log = helpers.log
 -- Declare widgets
 local spotify_artist = wibox.widget.textbox()
 local spotify_title = wibox.widget.textbox()
-local spotify_bg = wibox.widget.background()
+local spotify_bg = wibox.container.background()
 local cover = nil
 
 -- Main widget that includes all others

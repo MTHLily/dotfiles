@@ -153,7 +153,7 @@ awful.screen.connect_for_each_screen(function(s)
                 },
                 fg = beautiful.wibar_fg,
                 bg = x.color2,
-                widget = wibox.widget.background
+                widget = wibox.container.background
             },
             {
                 {

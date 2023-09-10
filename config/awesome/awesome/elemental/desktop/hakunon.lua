@@ -79,7 +79,7 @@ local hakunon_widget = wibox.widget {
         image = hakunon_box,
         halign = 0.7
     },
-    widget = wibox.widget.background
+    widget = wibox.container.background
 }
 local ram_widget = create_boxed_widget(wibox.widget {
     text = "ram_widget",
