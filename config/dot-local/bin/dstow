@@ -44,6 +44,7 @@ echo "$STOW_ADOPT"
 
 STOW_ARGS=()
 if [[ $STOW_ADOPT = "true" ]]; then
+  echo "Adopting..."
   STOW_ARGS+=("--adopt")
 fi
 
