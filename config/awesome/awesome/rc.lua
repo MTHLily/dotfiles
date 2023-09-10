@@ -234,7 +234,7 @@ require("elemental.window_switcher")
 -- Toggle-able microphone overlay
 require("elemental.microphone_overlay")
 
-require("elemental.desktop.hakunon")
+-- require("elemental.desktop.hakunon")
 
 -- >> Daemons
 -- Most widgets that display system/external info depend on evil.
@@ -355,8 +355,6 @@ local centered_client_placement = function(c)
     end)
 end
 
-gears.debug.dump("TALLEST SCREEN:")
-gears.debug.dump(tallest_screen.geometry.height)
 -- Rules
 -- ===================================================================
 -- Rules to apply to new clients (through the "manage" signal).
