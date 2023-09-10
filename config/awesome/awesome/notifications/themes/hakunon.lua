@@ -15,6 +15,7 @@ local helpers = require("helpers")
 beautiful.notification_bg = "#00000000"
 
 local default_icon = ""
+local singleton = {}
 
 -- Custom text icons according to the notification's app_name
 -- plus whether the title should be visible or not
@@ -57,7 +58,8 @@ local app_config = {
         title = true,
         message_align = "center",
         image_width = dpi(75),
-        icon_color = catppuccin.green
+        icon_color = catppuccin.green,
+        singleton = true
     },
     ['error'] = {icon = '󰋔'}
 }
@@ -125,7 +127,7 @@ local custom_widgets = {
                         },
                         {
                             align = message_align,
-                            -- wrap = "char",
+                            notification = n,
                             widget = naughty.widget.message
                         },
                         {
@@ -166,7 +168,7 @@ naughty.connect_signal("request::display", function(n)
         valign = "center",
         widget = wibox.widget.textbox
     }
-    local icon, title_visible, message_align, image_width
+    local icon, title_visible, message_align, image_width, is_singleton
     local color = urgency_color[n.urgency]
     helpers.log(color, "Urgency")
     -- Set icon according to app_name
@@ -178,6 +180,8 @@ naughty.connect_signal("request::display", function(n)
                         app_config[n.app_name].message_align or "center"
     image_width =
         app_config[n.app_name] and app_config[n.app_name].image_width or dpi(50)
+    is_singleton =
+        app_config[n.app_name] and app_config[n.app_name].singleton or false
 
     local centered_icon_widget = {
         markup = helpers.colorize_text(icon, color),
@@ -234,32 +238,82 @@ naughty.connect_signal("request::display", function(n)
             actions = actions
         }()
 
-    naughty.layout.box {
-        notification = n,
-        type = "notification",
-        -- For antialiasing: The real shape is set in widget_template
-        shape = gears.shape.rectangle,
-        border_width = beautiful.notification_border_width,
-        border_color = beautiful.notification_border_color,
-        position = beautiful.notification_position,
-        widget_template = {
-            {
+    if is_singleton then
+        if singleton[n.app_name] then
+            if singleton[n.app_name].notification == nil then
+                helpers.log("NIL NOTIFICATION")
+                singleton[n.app_name].notification = n
+            end
+            singleton[n.app_name].widget.children = {
+                wibox.widget {
+                    {
+                        left_widget,
+                        right_widget,
+                        layout = wibox.layout.fixed.horizontal
+                    },
+                    strategy = "max",
+                    width = beautiful.notification_max_width or dpi(350),
+                    height = beautiful.notification_max_height or dpi(180),
+                    widget = wibox.container.constraint
+                }
+            }
+            singleton[n.app_name].notification.title = n.title
+        else
+            singleton[n.app_name] = naughty.layout.box {
+                notification = n,
+                type = "notification",
+                -- For antialiasing: The real shape is set in widget_template
+                shape = gears.shape.rectangle,
+                border_width = beautiful.notification_border_width,
+                border_color = beautiful.notification_border_color,
+                position = beautiful.notification_position,
+                widget_template = {
+                    {
+                        {
+                            left_widget,
+                            right_widget,
+                            layout = wibox.layout.fixed.horizontal
+                        },
+                        strategy = "max",
+                        width = beautiful.notification_max_width or dpi(350),
+                        height = beautiful.notification_max_height or dpi(180),
+                        widget = wibox.container.constraint
+                    },
+                    -- Anti-aliasing container
+                    shape = helpers.rrect(beautiful.notification_border_radius),
+                    bg = x.color0,
+                    widget = wibox.container.background
+                }
+            }
+        end
+    else
+        naughty.layout.box {
+            notification = n,
+            type = "notification",
+            -- For antialiasing: The real shape is set in widget_template
+            shape = gears.shape.rectangle,
+            border_width = beautiful.notification_border_width,
+            border_color = beautiful.notification_border_color,
+            position = beautiful.notification_position,
+            widget_template = {
                 {
-                    left_widget,
-                    right_widget,
-                    layout = wibox.layout.fixed.horizontal
+                    {
+                        left_widget,
+                        right_widget,
+                        layout = wibox.layout.fixed.horizontal
+                    },
+                    strategy = "max",
+                    width = beautiful.notification_max_width or dpi(350),
+                    height = beautiful.notification_max_height or dpi(180),
+                    widget = wibox.container.constraint
                 },
-                strategy = "max",
-                width = beautiful.notification_max_width or dpi(350),
-                height = beautiful.notification_max_height or dpi(180),
-                widget = wibox.container.constraint
-            },
-            -- Anti-aliasing container
-            shape = helpers.rrect(beautiful.notification_border_radius),
-            bg = x.color0,
-            widget = wibox.container.background
+                -- Anti-aliasing container
+                shape = helpers.rrect(beautiful.notification_border_radius),
+                bg = x.color0,
+                widget = wibox.container.background
+            }
         }
-    }
+    end
 end)
 
 -- naughty.disconnect_signal("request::display",
