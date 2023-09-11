@@ -1,0 +1,6 @@
+logrotate state -- version 2
+"/home/maespera/.cache/awesome/stderr" 2023-9-11-20:0:0
+"/home/maespera/.cache/awesome/stdout" 2023-9-11-20:45:37
+"/home/maespera/cache/awesome/std*" 2023-9-11-20:0:0
+"/home/maespera/.cache/awesome/stdout.1.1" 2023-9-11-20:42:36
+"/home/maespera/.cache/awesome/stdout.1" 2023-9-11-20:42:29

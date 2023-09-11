@@ -1,0 +1,15 @@
+"/home/maespera/.cache/awesome/stderr" {
+  create
+  rotate 5
+  size 30M
+  missingok
+  notifempty
+}
+
+"/home/maespera/.cache/awesome/stdout" {
+  create
+  rotate 5
+  size 30M
+  missingok
+  notifempty
+}
