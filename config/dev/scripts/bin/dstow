@@ -8,6 +8,8 @@ die() {
 STOW_META_FILE=".stow-meta"
 STOW_GLOBAL_IGNORE_PATH="$HOME/.stow-global-ignore"
 
+CLEANUP_FN=()
+
 # Initialize stow-meta
 if [ -f "$STOW_GLOBAL_IGNORE_PATH" ]; then
   echo "Stow exists"
@@ -32,6 +34,7 @@ if [ -f "$PACKAGE_PATH/$STOW_META_FILE" ]; then
   PACKAGE_LABEL="$(echo "$PACKAGE_CONFIG" | jq '.meta.name')"
   eval PACKAGE_TARGET="$(echo "$PACKAGE_CONFIG" | jq '.meta.target')"
   STOW_ADOPT="$(echo "$PACKAGE_CONFIG" | jq '.meta.adopt')"
+  STOW_DOTFILES="$(echo "$PACKAGE_CONFIG" | jq '.meta.dotfiles')"
 else
   PACKAGE_LABEL="$PACKAGE_NAME"
   PACKAGE_TARGET="$HOME/.config"
@@ -43,9 +46,18 @@ echo "$PACKAGE_TARGET"
 echo "$STOW_ADOPT"
 
 STOW_ARGS=()
-if [[ $STOW_ADOPT = "true" ]]; then
-  echo "Adopting..."
+if [[ "$STOW_ADOPT" = "true" ]]; then
   STOW_ARGS+=("--adopt")
 fi
+if [[ "$STOW_DOTFILES" = "true" ]]; then
+  STOW_ARGS+=("--dotfiles" "--ignore=dot-.*")
+  for dotdir in $(exa -n -d "$PACKAGE_PATH"/dot-*); do
+    origin=$(echo "$dotdir" | sd '^.*/dot-' 'dot-')
+    target=$(echo "$dotdir" | sd '^.*/dot-' '.')
+    ln -s "$origin" "$PACKAGE_PATH/$target"
+  done
+fi
 
-stow --target "$PACKAGE_TARGET" "${ARG_ADOPT[@]}" "$PACKAGE_NAME"
+stow --target "$PACKAGE_TARGET" "${STOW_ARGS[@]}" "$PACKAGE_NAME" || exit $?
+
+echo "$PACKAGE_LABEL successful!"

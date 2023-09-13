@@ -24,6 +24,30 @@ M.harpoon = {
     }
 }
 
+M.telescope = {
+    n = {
+        ["<leader>fwa"] = {
+            function()
+                require('telescope.builtin').live_grep({
+                    vimgrep_arguments = {
+                        "rg",
+                        "-L",
+                        "--color=never",
+                        "--no-heading",
+                        "--with-filename",
+                        "--line-number",
+                        "--column",
+                        "--smart-case",
+                        "--hidden"
+                    }
+                })
+            end,
+            "live grep (all)"
+        },
+        ["<leader>fww"] = {"<cmd> Telescope live_grep <CR>", "live grep"}
+    }
+}
+
 M.trouble = {
     n = {
         ["<leader>tt"] = {"<cmd> TroubleToggle<CR>", "toggle Trouble"},
