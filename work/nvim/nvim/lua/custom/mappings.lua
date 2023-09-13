@@ -15,6 +15,25 @@ M.trouble = {
   }
 }
 
+M.harpoon = {
+    n = {
+        ["<leader>fd"] = {
+            "<cmd> lua require('harpoon.mark').add_file()<CR>",
+            "add file to harpoon"
+        },
+        ["<leader>fg"] = {
+            "<cmd> lua require('harpoon.ui').toggle_quick_menu()<CR>",
+            ""
+        },
+        ["<leader>fs"] = {
+            "<cmd> Telescope harpoon marks<CR>",
+            ""
+        },
+        ["<A-d>"] = {"<cmd> lua require('harpoon.ui').nav_next()<CR>", ""},
+        ["<A-u>"] = {"<cmd> lua require('harpoon.ui').nav_prev()<CR>", ""}
+    }
+}
+
 M.telescope = {
   n = {
     ["<leader>fwa"] = { function()
@@ -33,6 +52,13 @@ M.telescope = {
       })
     end, "live grep (all)" },
     ["<leader>fww"] = { "<cmd> Telescope live_grep <CR>", "live grep" },
+  }
+}
+
+M.logs = {
+  n = {
+    ["<leader>lm"] = {"<cmd> Noice<CR>", "Message logs"},
+    ["<leader>ll"] = {"<cmd> LspLog<CR>", "LSP logs"}
   }
 }
 

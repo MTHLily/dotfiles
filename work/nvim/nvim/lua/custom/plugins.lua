@@ -1,4 +1,18 @@
 local plugins = {
+  -- UI plugins
+  {
+    "folke/noice.nvim",
+    lazy = false,
+    config = function()
+      require("noice").setup({})
+    end,
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+    }
+  },
+  -- Functionality Plugins
+  { 'ThePrimeagen/harpoon',    lazy = false },
   { "christoomey/vim-tmux-navigator", lazy = false },
   {
     "nvim-treesitter/nvim-treesitter",
@@ -59,18 +73,7 @@ local plugins = {
   },
   "nvim-telescope/telescope.nvim",
   opts = {
-    defaults = {
-    vimgrep_arguments = {
-      "rg",
-      "-L",
-      "--color=never",
-      "--no-heading",
-      "--with-filename",
-      "--line-number",
-      "--column",
-      "--smart-case",
-    },
-    }
+    extensions_list = { "harpoon" }
   },
   {
     "folke/trouble.nvim",
