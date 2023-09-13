@@ -28,3 +28,4 @@ set -Ux JIRA_AUTH_TYPE bearer
 fish_add_path $HOME/.config/fish/scripts
 fish_add_path $HOME/.config/npm/bin
 fish_add_path $HOME/.cargo/bin
+fish_add_path $HOME/.local/bin
