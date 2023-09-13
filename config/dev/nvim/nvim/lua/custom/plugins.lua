@@ -1,10 +1,6 @@
 local plugins = {
-    {
-        "folke/noice.nvim",
-        lazy = false,
-        config = function() require("noice").setup({}) end,
-        dependencies = {"MunifTanjim/nui.nvim", "rcarriga/nvim-notify"}
-    },
+    require("custom.lib.plugins.notify").plugin,
+    require("custom.lib.plugins.noice").plugin,
     {"christoomey/vim-tmux-navigator", lazy = false},
     {"dag/vim-fish"},
     {
@@ -29,7 +25,7 @@ local plugins = {
     },
     {
         "folke/trouble.nvim",
-        requires = "nvim-tree/nvim-web-devicons",
+        dependencies = "nvim-tree/nvim-web-devicons",
         config = function() require("trouble").setup {} end,
         lazy = false
     },

@@ -24,6 +24,18 @@ M.harpoon = {
     }
 }
 
+M.external = {
+    n = {
+        ["<leader>eg"] = {
+            function()
+                local buf_name = vim.api.nvim_buf_get_name(0):match("(.*/)")
+                local dir = (buf_name ~= "") and buf_name or vim.loop.cwd()
+                vim.cmd('!tmux neww -c "' .. dir .. '" bash -c lazygit')
+            end
+        }
+    }
+}
+
 M.telescope = {
     n = {
         ["<leader>fwa"] = {
