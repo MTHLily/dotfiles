@@ -137,6 +137,44 @@ awful.screen.connect_for_each_screen(function(s)
         widget = wibox.container.background
     }
 
+    local tray_cnt = wibox.widget {text = "", widget = wibox.widget.textbox}
+
+    s.tray_widget = wibox.widget {
+        {
+            {
+                {
+                    {
+                        text = "󱊖",
+                        valign = "center",
+                        halign = "center",
+                        font = beautiful.tasklist_font,
+                        widget = wibox.widget.textbox
+                    },
+                    margins = dpi(8),
+                    widget = wibox.container.margin
+                },
+                fg = beautiful.wibar_fg,
+                bg = x.color6,
+                widget = wibox.container.background
+            },
+            {
+                tray_cnt,
+                left = dpi(8),
+                right = dpi(8),
+                widget = wibox.container.margin
+            },
+            layout = wibox.layout.align.horizontal
+        },
+        fg = beautiful.wibar_bg,
+        bg = beautiful.wibar_fg,
+        shape = helpers.prrect(beautiful.wibar_border_radius, true, true, true,
+            true),
+        widget = wibox.container.background
+    }
+
+    awesome.connect_signal("systray::update",
+        function() tray_cnt.text = awesome.systray() end)
+
     s.wibar_clock = wibox.widget {
         {
             {
@@ -178,7 +216,12 @@ awful.screen.connect_for_each_screen(function(s)
     s.wibar_container = wibox.widget {
         s.taglist_container,
         nil,
-        s.wibar_clock,
+        {
+            s.tray_widget,
+            s.wibar_clock,
+            spacing = beautiful.useless_gap,
+            layout = wibox.layout.fixed.horizontal
+        },
         layout = wibox.layout.align.horizontal
     }
 
@@ -211,6 +254,7 @@ awful.screen.connect_for_each_screen(function(s)
         shape = helpers.rrect(beautiful.border_radius),
         widget = wibox.container.background
     }
+
     awful.placement.bottom_right(s.traybox,
         {margins = beautiful.useless_gap * 2})
     s.traybox:buttons(gears.table.join(awful.button({}, 2, function()
@@ -232,8 +276,19 @@ function tray_resize()
     for s in screen do
         s.traybox.width = (beautiful.systray_icon_size * systray_cols) +
                               (beautiful.systray_icon_spacing * systray_cols)
-        awful.placement.bottom_right(s.traybox,
-            {margins = beautiful.useless_gap * 2})
+        if wibox.widget.systray().screen == s and mouse.current_widget_geometry then
+            local geometry, position, anchor = mouse.current_widget_geometry,
+                "bottom", "middle"
+            awful.placement.next_to(s.traybox, {
+                preferred_positions = position,
+                preferred_anchors = anchor,
+                geometry = geometry,
+                margins = beautiful.useless_gap * 2
+            })
+        else
+            awful.placement.bottom_right(s.traybox,
+                {margins = beautiful.useless_gap * 2})
+        end
     end
 end
 
